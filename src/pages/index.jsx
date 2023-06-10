@@ -23,7 +23,7 @@ export default function Home() {
             />
         </Head>
         <Sidebar>
-            <div className="md:flex md:items-center md:justify-between">
+        <div className="md:flex md:items-center md:justify-between">
             <div className="flex-1 min-w-0">
                 <h2 className="text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:text-3xl sm:tracking-tight">
                 {t("home.Welcome")}
@@ -35,13 +35,13 @@ export default function Home() {
                 type="button"
                 className="inline-flex items-center px-3 py-2 ml-3 text-sm font-semibold text-white rounded-md shadow-sm bg-sky-600 hover:bg-sky-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-600"
                 >
-                 {t("home.Dashboard")}
+                {t("home.Dashboard")}
                 </button>
             </div>
             </div>
 
             <div className="p-6 mt-6 bg-white shadow-md">
-            <h3 className="text-lg font-semibold"> {t("home.VIMS")}</h3>
+            <h3 className="text-lg font-semibold">{t("home.VIMS")}</h3>
             <p className="py-4 mt-2 text-gray-600">
                 {t("home.Description1")}
             </p>
@@ -50,7 +50,22 @@ export default function Home() {
                 {t("home.Description2")}
                 </blockquote>
             </div>
+            <div className="grid max-w-6xl grid-cols-1 gap-8 py-4 mt-4 md:grid-cols-3">
+                <div className="p-4 bg-gray-100 rounded-lg shadow">
+                <h3 className="mb-2 text-sm font-semibold">{t("home.Admin")}</h3>
+                <p className="text-sm text-gray-700 ">{t("home.AdminDescription")}</p>
+                </div>
+                <div className="p-4 bg-gray-100 rounded-lg shadow">
+                <h3 className="mb-2 text-sm font-semibold">{t("home.Officer")}</h3>
+                <p className="text-sm text-gray-700">{t("home.OfficerDescription")}</p>
+                </div>
+                <div className="p-4 bg-gray-100 rounded-lg shadow">
+                <h3 className="mb-2 text-sm font-semibold">{t("home.Villager")}</h3>
+                <p className="text-sm text-gray-700">{t("home.VillagerDescription")}</p>
+                </div>
             </div>
+            </div>
+
         </Sidebar>
         </>
     )

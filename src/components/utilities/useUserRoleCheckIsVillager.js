@@ -20,7 +20,12 @@ export function useUserRoleCheckIsVillager() {
           throw new Error(userError.message);
         }
 
-        if (userData?.roles?.name === 'Super Admin' || userData?.roles?.name === 'Village Officer' || userData?.roles?.name === 'Villager') {
+        if (
+          userData?.roles?.name === 'Super Admin' ||
+          userData?.roles?.name === 'Village Officer' ||
+          userData?.roles?.name === 'Villager'
+        ) {
+          // User has one of the allowed roles
         } else {
           console.log('User does not have the required role');
           router.push('/login'); // Redirect to the login page

@@ -74,7 +74,7 @@ export default function Sidebar({children}) {
     }
     
     const navigation = [
-      { name: t('sidebar.Home'), href: '/index', icon: HomeIcon },
+      { name: t('sidebar.Home'), href: '/', icon: HomeIcon },
       { name: t('sidebar.Dashboard'), href: '/admin/dashboard', icon: Squares2X2Icon },
       { name: t('sidebar.Households'), href: '/admin/households', icon: HomeModernIcon },
       { name: t('sidebar.Families'), href: '/admin/families', icon: UserGroupIcon },

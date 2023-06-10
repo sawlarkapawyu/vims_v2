@@ -1,7 +1,7 @@
 import { GridFilterListIcon } from '@mui/x-data-grid';
 import React, { useState, useEffect } from "react";
-// import { useSupabaseClient } from '@supabase/auth-helpers-react'
-import { supabase } from "/src/components/utilities/supabase";
+import { useSupabaseClient } from '@supabase/auth-helpers-react'
+// import { supabase } from "/src/components/utilities/supabase";
 import { UserGroupIcon, HomeModernIcon, DocumentDuplicateIcon, StarIcon } from '@heroicons/react/24/outline';
 import DropdownSelect from 'react-dropdown-select';
 import { useTranslation } from "next-i18next";
@@ -16,7 +16,7 @@ Chart.register(LinearScale, CategoryScale, BarController, BarElement, ArcElement
 
 
 const Dashboard = () => {
-    // const supabase = useSupabaseClient();
+    const supabase = useSupabaseClient();
     const [isLoading, setIsLoading] = useState(false);
     const [errorMessage, setErrorMessage] = useState("");
     const { t } = useTranslation("");
@@ -56,6 +56,10 @@ const Dashboard = () => {
     const [genders, setGenders] = useState([]);
     const [selectedGender, setSelectedGender] = useState('');
 
+    //Count user
+    const [users, setUsers] = useState([]);
+    const [totalCount, setTotalCount] = useState(0);
+      
     useEffect(() => {
         const fetchData = async () => {
           try {
@@ -128,6 +132,27 @@ const Dashboard = () => {
         }
     };
 
+    useEffect(() => {
+        fetchUsers();
+      }, []);
+    
+      async function fetchUsers() {
+        try {
+          const { data, error } = await supabase
+            .from('users')
+            .select('*');
+    
+          if (error) {
+            throw new Error(error.message);
+          }
+    
+          setUsers(data);
+          setTotalCount(data.length);
+        } catch (error) {
+          console.error('Error fetching users:', error.message);
+        }
+    }
+    
     async function fetchGenders() {
         try {
           const { data, error } = await supabase
@@ -150,25 +175,6 @@ const Dashboard = () => {
           console.log('Error fetching gender:', error.message);
         }
     }
-      
-    // async function fetchGenders() {
-    //     try {
-    //       const { data, error } = await supabase
-    //       .from('families')
-    //       .select('gender');
-      
-    //       if (error) {
-    //         throw new Error(error.message);
-    //       }
-      
-    //       // Extract unique gender values by filtering out duplicates
-    //       const uniqueGenders = [...new Set(data.map((row) => row.gender))];
-      
-    //       setGenders(uniqueGenders);
-    //     } catch (error) {
-    //       console.log('Error fetching gender:', error.message);
-    //     }
-    // }
 
     async function fetchDeaths() {
         try {
@@ -889,7 +895,7 @@ const Dashboard = () => {
                         </svg>
                     </div>
                     <div>
-                        <span className="block text-2xl font-bold">1</span>
+                        <span className="block text-2xl font-bold">{totalCount}</span>
                         <span className="block text-sm text-gray-500">{t("dashboard.TotalUsers")}</span>
                     </div>
                     <div className="absolute bottom-0 left-0 w-full h-1 bg-blue-200" />

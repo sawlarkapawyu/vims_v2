@@ -18,7 +18,13 @@
       "VIMS": "Village Information Management System (VIMS)",
       "Description1": "The Village Information Management System (VIMS) is designed to streamline and manage various aspects of village administration, including record-keeping, reporting, and collaboration.",
       "Description2": "As a registered user of VIMS, you will have access to a range of features and functionalities to facilitate your village management tasks.",
-      "Dashboard": "Go To Dashboard"
+      "Dashboard": "Go To Dashboard",
+      "Admin": "Admin Role",
+      "AdminDescription": "As an Admin, you have full control over the system. You can manage users, households, population records, death records, and disability information. Additionally, you have access to comprehensive reports and a dashboard that provides valuable insights and analytics.",
+      "Officer": "Officer Role",
+      "OfficerDescription": "As an Officer, you play a crucial role in managing the system. You have the authority to manage households, population records, death records, and disability information. You can contribute to the accurate and up-to-date data in the system. Furthermore, you have access to reports and a dashboard to monitor and analyze relevant information.",
+      "Villager": "Villager/Visitor Role",
+      "VillagerDescription": "As a Villager or Visitor, your role is focused on accessing information. You can explore the system's dashboard, which provides a snapshot of relevant data and statistics. However, you do not have direct permissions to update or manage the data."
     },
     "profile": {
       "Title": "User Profile",

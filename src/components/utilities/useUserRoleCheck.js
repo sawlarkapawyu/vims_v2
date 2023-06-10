@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useUser, useSupabaseClient } from '@supabase/auth-helpers-react';
 import { useRouter } from 'next/router';
 
@@ -6,6 +6,7 @@ export function useUserRoleCheck() {
   const user = useUser();
   const supabase = useSupabaseClient();
   const router = useRouter();
+  const [alertMessage, setAlertMessage] = useState('');
 
   useEffect(() => {
     async function checkUserRole() {
@@ -21,12 +22,14 @@ export function useUserRoleCheck() {
         }
 
         if (userData?.roles?.name === 'Super Admin' || userData?.roles?.name === 'Village Officer') {
+          // User has the required role
         } else {
-          console.log('User does not have the required role');
-          router.push('/login'); // Redirect to the register page
+          setAlertMessage('User does not have the required role');
+          router.push('/login'); // Redirect to the login page
         }
       } catch (error) {
         console.error('Error checking user role:', error.message);
+        setAlertMessage('Error checking user role');
         router.push('/');
       }
     }
@@ -34,9 +37,10 @@ export function useUserRoleCheck() {
     if (user) {
       checkUserRole();
     } else {
+      setAlertMessage('User not logged in');
       router.push('/login');
     }
   }, [user, router, supabase]);
 
-  return null;
+  return <div>{alertMessage && <p>{alertMessage}</p>}</div>;
 }
