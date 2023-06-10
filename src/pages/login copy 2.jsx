@@ -10,13 +10,13 @@ import { ThemeSupa } from '@supabase/auth-ui-shared'
 import { useUser, useSupabaseClient } from '@supabase/auth-helpers-react'
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/router';
+import { HCaptcha } from '@hcaptcha/react-hcaptcha'; // Import hCaptcha component
 
 export default function Login() {
-
   const supabaseClient = useSupabaseClient()
   const user = useUser()
   const router = useRouter();
-  
+
   const [data, setData] = useState()
   const logo = "/images/logo.png";
 
@@ -29,7 +29,13 @@ export default function Login() {
     if (user) loadData()
   }, [user])
 
-  
+  // Callback function for hCaptcha verification
+  const handleHcaptchaVerify = async (token) => {
+    const response = await fetch(`/api/verify-hcaptcha?apikey=7511e771-9dcc-4936-8506-4368eb00a3f1&token=${token}`);
+    const data = await response.json();
+    console.log(data);
+  }
+
   return (
     <>
       <Head>
@@ -39,8 +45,8 @@ export default function Login() {
         <div className="flex flex-col">
           <Link href="/" passHref>
             <div className="flex flex-col items-center">
-              <Image 
-                src={logo} 
+              <Image
+                src={logo}
                 alt="Logo"
                 width={80}
                 height={10}
@@ -56,24 +62,44 @@ export default function Login() {
             </h2>
           </div>
         </div>
-        <Auth
-            redirectTo="/"
+        {user ? (
+          <div>
+            {/* User is logged in */}
+            <p>Welcome, {user.email}</p>
+            <Button onClick={() => supabaseClient.auth.signOut()}>Sign Out</Button>
+          </div>
+        ) : (
+          <Auth
+            redirectTo={router.asPath}
             supabaseClient={supabaseClient}
             providers={['google', 'facebook', 'github']}
             socialLayout="horizontal"
-            appearance={{ theme: ThemeSupa, 
-            variables: {
-            default: {
-            colors: {
+            appearance={{
+              theme: ThemeSupa,
+              variables: {
+                default: {
+                  colors: {
                     brand: '#1E90FF',
                     brandAccent: '#00BFFF',
-                    },
+                  },
                 },
-            } }}
-            onSuccess={() => router.push('/')}
-        />
+              },
+            }}
+            // Custom render function to include hCaptcha
+            customComponents={{
+              postSocial: () => (
+                <div>
+                  <p>Complete hCaptcha to continue</p>
+                  <HCaptcha
+                    sitekey="7511e771-9dcc-4936-8506-4368eb00a3f1"
+                    onVerify={handleHcaptchaVerify}
+                  />
+                </div>
+              ),
+            }}
+          />
+        )}
       </AuthLayout>
     </>
   )
-  
 }

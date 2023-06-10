@@ -113,4 +113,3 @@ GRANT EXECUTE ON FUNCTION delete_user_with_service_role(uuid) TO service_role;
 
 
 GRANT SELECT ON TABLE auth.users TO service_role;
-
