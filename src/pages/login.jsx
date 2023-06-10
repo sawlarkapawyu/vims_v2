@@ -57,11 +57,11 @@ export default function Login() {
           </div>
         </div>
         <Auth
-            redirectTo="/"
-            supabaseClient={supabaseClient}
-            providers={['google', 'facebook', 'github']}
-            socialLayout="horizontal"
-            appearance={{ theme: ThemeSupa, 
+        redirectTo={router.asPath}
+        supabaseClient={supabaseClient}
+        providers={['google', 'facebook', 'github']}
+        socialLayout="horizontal"
+        appearance={{ theme: ThemeSupa, 
             variables: {
             default: {
             colors: {
@@ -70,7 +70,6 @@ export default function Login() {
                     },
                 },
             } }}
-            onSuccess={() => router.push('/')}
         />
       </AuthLayout>
     </>
