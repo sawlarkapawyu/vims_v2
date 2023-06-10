@@ -4,9 +4,8 @@ import Link from "next/link";
 import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/20/solid'
 import React, { useState, useEffect } from "react";
 import { FolderPlusIcon, PencilSquareIcon, TrashIcon } from '@heroicons/react/24/outline';
-
-// import { useSupabaseClient } from '@supabase/auth-helpers-react'
-import { supabase } from "/src/components/utilities/supabase";
+import { useUser, useSupabaseClient } from '@supabase/auth-helpers-react'
+import { useUserRoleCheck } from '/src/components/utilities/useUserRoleCheck.js';
 
 import { useRouter } from 'next/router';
 import { formatDate, classNames } from '/src/components/utilities/tools.js';
@@ -15,12 +14,16 @@ import { useTranslation } from "next-i18next";
 
 export default function Disability() {
     const router = useRouter();
-    // const supabase = useSupabaseClient();
+    const supabase = useSupabaseClient();
+    const user = useUser()
+    
     const { t } = useTranslation("");
     
     const [isLoading, setIsLoading] = useState(false);
     const [disabilities, setDisabilities] = useState([]);
 
+    useUserRoleCheck();
+    
     useEffect(() => {
         fetchDisabilities();
     }, []);

@@ -2,9 +2,8 @@ import Head from 'next/head'
 import Sidebar from '@/components/admin/layouts/Sidebar'
 import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/20/solid'
 import React, { useState, useEffect } from "react";
-
-// import { useSupabaseClient } from '@supabase/auth-helpers-react'
-import { supabase } from "/src/components/utilities/supabase";
+import { useUser, useSupabaseClient } from '@supabase/auth-helpers-react'
+import { useUserRoleCheck } from '/src/components/utilities/useUserRoleCheck.js';
 
 import { useRouter } from 'next/router';
 import { formatDate } from '/src/components/utilities/tools.js';
@@ -15,7 +14,9 @@ import { useTranslation } from "next-i18next";
 
 export default function FamilySearch() {
     const router = useRouter();
-    // const supabase = useSupabaseClient();
+    const supabase = useSupabaseClient();
+    const user = useUser()
+    
     const { t } = useTranslation("");
     const [isLoading, setIsLoading] = useState(false);
     const [errorMessage, setErrorMessage] = useState("");
@@ -36,6 +37,8 @@ export default function FamilySearch() {
     const [selectedVillage, setSelectedVillage] = useState('');
     const [households, setHouseholds] = useState([]);
     const [selectedHousehold, setSelectedHousehold] = useState('');
+    
+    useUserRoleCheck();
     
     
     useEffect(() => {

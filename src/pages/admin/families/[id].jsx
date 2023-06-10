@@ -3,8 +3,8 @@ import Sidebar from '@/components/admin/layouts/Sidebar'
 import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/20/solid'
 import React, { useState, useEffect } from "react";
 
-// import { useSupabaseClient } from '@supabase/auth-helpers-react'
-import { supabase } from "/src/components/utilities/supabase";
+import { useUser, useSupabaseClient } from '@supabase/auth-helpers-react'
+import { useUserRoleCheck } from '/src/components/utilities/useUserRoleCheck.js';
 
 import { useRouter } from 'next/router';
 import { ArrowUturnLeftIcon } from '@heroicons/react/24/outline';
@@ -12,9 +12,22 @@ import { getDateValue } from '/src/components/utilities/tools.js';
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { useTranslation } from "next-i18next";
 
+export const getStaticPaths = async () => {
+    return {
+      fallback: true,
+      paths: [
+        '/admin/families/id',
+        { params: { id: '1' } },
+      ],
+    };
+};
+  
+
 export default function HouseholdEdit() {
     const router = useRouter();
-    // const supabase = useSupabaseClient();
+    const supabase = useSupabaseClient();
+    const user = useUser()
+    
     const { id } = router.query; // Retrieve the `id` parameter from the route
     const { t } = useTranslation("");
     
@@ -25,7 +38,10 @@ export default function HouseholdEdit() {
     const [motherName, setMotherName] = useState('');
     const [remark, setRemark] = useState('');
     const [resident, setResident] = useState("");
+    
+    useUserRoleCheck();
 
+    
     //Occupation
     const [occupations, setOccupations] = useState([]);
     const [selectedOccupation, setSelectedOccupation] = useState('');
@@ -1261,27 +1277,6 @@ export default function HouseholdEdit() {
         
         </>
     )
-}
-
-export async function getStaticPaths() {
-    const { data: families, error } = await supabase.from('families').select('id');
-  
-    if (error) {
-      console.error('Error fetching families:', error);
-      return {
-        paths: [],
-        fallback: false,
-      };
-    }
-    // Generate the dynamic paths based on the death IDs
-    const paths = families.map((family) => ({
-      params: { id: family.id.toString() },
-    }));
-  
-    return {
-      paths,
-      fallback: false,
-    };
 }
 
 export async function getStaticProps({ locale }) {

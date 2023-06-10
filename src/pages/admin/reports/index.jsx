@@ -4,10 +4,11 @@ import Reports from '@/components/admin/Report'
 import { ChevronRightIcon, ChevronLeftIcon } from '@heroicons/react/24/outline';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { useTranslation } from "next-i18next";
+import { useUserRoleCheck } from '/src/components/utilities/useUserRoleCheck.js';
 
 export default function Home() {
     const { t } = useTranslation("");
-
+    useUserRoleCheck();
   return (
     <>
         <Head>

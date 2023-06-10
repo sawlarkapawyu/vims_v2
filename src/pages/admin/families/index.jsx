@@ -3,19 +3,21 @@ import Head from 'next/head'
 import Sidebar from '@/components/admin/layouts/Sidebar'
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-// import { useSupabaseClient } from '@supabase/auth-helpers-react'
-import { supabase } from "/src/components/utilities/supabase";
+import { useUser, useSupabaseClient } from '@supabase/auth-helpers-react'
 
 import { useRouter } from 'next/router';
 import { ChevronLeftIcon, ChevronRightIcon, DocumentPlusIcon, PencilSquareIcon, TrashIcon } from '@heroicons/react/24/outline';
 import { formatDate, classNames } from '/src/components/utilities/tools.js';
+import { useUserRoleCheck } from '/src/components/utilities/useUserRoleCheck.js';
 
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { useTranslation } from "next-i18next";
 
 export default function Family() {
     const router = useRouter();
-    // const supabase = useSupabaseClient();
+    const user = useUser()
+    const supabase = useSupabaseClient();
+    
     const { t } = useTranslation("");
     const [isLoading, setIsLoading] = useState(false);
     const [errorMessage, setErrorMessage] = useState("");
@@ -37,6 +39,8 @@ export default function Family() {
     const [selectedReligion, setSelectedReligion] = useState('');
     const [households, setHouseholds] = useState([]);
     const [selectedHousehold, setSelectedHousehold] = useState('');
+
+    useUserRoleCheck();
     
     useEffect(() => {
         fetchFamilies();

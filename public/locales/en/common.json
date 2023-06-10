@@ -1,12 +1,43 @@
 {
     "sidebar": {
+      "Home": "Home",
       "Dashboard": "Dashboard",
       "Households": "Households Information",
       "Families": "Families Information",
       "Deaths": "Deaths Information",
       "Disabilities": "Disabilities Information",
       "Reports": "Reports",
-      "VIMS": "Village Information Management System"
+      "VIMS": "Village Information Management System",
+      "UserManagement": "User Management",
+      "Profile": "Your Profile",
+      "SignOut": "Sign out",
+      "LogIn": "Login"
+    },
+    "home": {
+      "Welcome": "Welcome to VIMS",
+      "VIMS": "Village Information Management System (VIMS)",
+      "Description1": "The Village Information Management System (VIMS) is designed to streamline and manage various aspects of village administration, including record-keeping, reporting, and collaboration.",
+      "Description2": "As a registered user of VIMS, you will have access to a range of features and functionalities to facilitate your village management tasks.",
+      "Dashboard": "Go To Dashboard"
+    },
+    "profile": {
+      "Title": "User Profile",
+      "Email": "Email Address",
+      "FullName": "Full Name",
+      "Username": "Username",
+      "Website": "Website",
+      "Upload": "Upload",
+      "SignOut": "Sign Out",
+      "Update": "Update"
+    },
+    "user": {
+      "No": "No",
+      "Name": "Name",
+      "Role": "Roles",
+      "Created": "Created",
+      "Action": "Action",
+      "Delete": "Delete",
+      "Save": "Save"
     },
     "dashboard": {
       "TotalPopulations": "Total Populations",

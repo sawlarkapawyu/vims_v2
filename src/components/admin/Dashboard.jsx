@@ -900,7 +900,7 @@ const Dashboard = () => {
             {/* Chart */}
             <section className="grid grid-cols-1 gap-4 py-4 md:grid-cols-3">
                 <div className="relative flex items-center col-span-2 p-8 bg-white rounded-lg shadow hover:bg-gray-100">
-                    <div className="w-full mx-auto overflow-hidden">
+
                     <Bar
                         data={{
                         labels: barChartLabels,
@@ -959,16 +959,16 @@ const Dashboard = () => {
                                 font: {
                                 weight: 'bold',
                                 size: 14,
+                                padding: { top: 40, bottom: 0 }
                                 },
                             },
                             },
                         },
                         }}
                     />
-                    </div>
                 </div>
                 <div className="relative flex items-center col-span-1 p-8 bg-white rounded-lg shadow hover:bg-gray-100">
-                    <div className="w-full mx-auto overflow-hidden">
+                    
                     <Pie
                         data={{
                         labels: [t('dashboard.Male'), t('dashboard.Female')],
@@ -1011,7 +1011,7 @@ const Dashboard = () => {
                         },
                         }}
                     />
-                    </div>
+                    
                 </div>
             </section>
             {/* Chart End       */}

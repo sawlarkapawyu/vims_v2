@@ -2,9 +2,8 @@ import Head from 'next/head'
 import Sidebar from '@/components/admin/layouts/Sidebar'
 import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/20/solid'
 import React, { useState, useEffect } from "react";
-
-// import { useSupabaseClient } from '@supabase/auth-helpers-react'
-import { supabase } from "/src/components/utilities/supabase";
+import { useUser, useSupabaseClient } from '@supabase/auth-helpers-react'
+import { useUserRoleCheck } from '/src/components/utilities/useUserRoleCheck.js';
 
 import { useRouter } from 'next/router';
 import { ArrowUturnLeftIcon } from '@heroicons/react/24/outline';
@@ -13,7 +12,9 @@ import { useTranslation } from "next-i18next";
 
 export default function HouseholdAdd() {
     const router = useRouter();
-    // const supabase = useSupabaseClient();
+    const supabase = useSupabaseClient();
+    const user = useUser()
+
     const { t } = useTranslation("");
     const [name, setName] = useState('');
     const [dob, setDob] = useState('');
@@ -22,6 +23,8 @@ export default function HouseholdAdd() {
     const [motherName, setMotherName] = useState('');
     const [remark, setRemark] = useState('');
 
+    useUserRoleCheck();
+    
     useEffect(() => {
         fetchOccupations();
         fetchEducations();

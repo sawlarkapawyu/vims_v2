@@ -3,8 +3,8 @@ import Sidebar from '@/components/admin/layouts/Sidebar'
 import { ChevronLeftIcon, ChevronRightIcon, ClipboardDocumentCheckIcon } from '@heroicons/react/20/solid'
 import React, { useState, useEffect } from "react";
 
-// import { useSupabaseClient } from '@supabase/auth-helpers-react'
-import { supabase } from "/src/components/utilities/supabase";
+import { useUser, useSupabaseClient } from '@supabase/auth-helpers-react'
+import { useUserRoleCheck } from '/src/components/utilities/useUserRoleCheck.js';
 
 import { useRouter } from 'next/router';
 import { formatDate } from '/src/components/utilities/tools.js';
@@ -13,7 +13,9 @@ import { useTranslation } from "react-i18next";
 
 export default function DisibilitySearch() {
     const router = useRouter();
-    // const supabase = useSupabaseClient();
+    const supabase = useSupabaseClient();
+    const user = useUser()
+    
     const { t } = useTranslation();
     
     const [isLoading, setIsLoading] = useState(false);
@@ -36,6 +38,7 @@ export default function DisibilitySearch() {
     const [households, setHouseholds] = useState([]);
     const [selectedHousehold, setSelectedHousehold] = useState('');
     
+    useUserRoleCheck();
     
     useEffect(() => {
         fetchFamilies();

@@ -2,19 +2,31 @@ import Head from 'next/head'
 import Sidebar from '@/components/admin/layouts/Sidebar'
 import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/20/solid'
 import React, { useState, useEffect } from "react";
-
-// import { useSupabaseClient } from '@supabase/auth-helpers-react'
-import { supabase } from "/src/components/utilities/supabase";
-
+import { useUser, useSupabaseClient } from '@supabase/auth-helpers-react'
+import { useUserRoleCheck } from '/src/components/utilities/useUserRoleCheck.js';
+// import {supabase} from '/src/components/utilities/supabase';
 import { useRouter } from 'next/router';
 import { ArrowUturnLeftIcon } from '@heroicons/react/24/outline';
 import { getDateValue } from '/src/components/utilities/tools.js';
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { useTranslation } from "next-i18next";
 
+export const getStaticPaths = async () => {
+    return {
+      fallback: true,
+      paths: [
+        '/admin/deaths/id',
+        { params: { id: '1' } },
+      ],
+    };
+};
+  
+
 export default function DeathEdit() {
     const router = useRouter();
-    // const supabase = useSupabaseClient();
+    const supabase = useSupabaseClient();
+    const user = useUser()
+    
     const { id } = router.query;
     const { t } = useTranslation("");
     
@@ -23,6 +35,8 @@ export default function DeathEdit() {
     const [deathPlace, setDeathPlace] = useState('');
     const [complainant, setComplainant] = useState('');
     const [remark, setRemark] = useState('');
+    
+    useUserRoleCheck();
     
     useEffect(() => {
         const fetchDeathData = async () => {
@@ -243,35 +257,6 @@ export default function DeathEdit() {
     )
 }
 
-// export async function getStaticPaths() {
-//     return {
-//       paths: [
-//         '/admin/deaths/[id]',
-//       ],
-//     }
-// }
-
-export async function getStaticPaths() {
-    const { data: deaths, error } = await supabase.from('deaths').select('id');
-  
-    if (error) {
-      console.error('Error fetching deaths:', error);
-      return {
-        paths: [],
-        fallback: false,
-      };
-    }
-    // Generate the dynamic paths based on the death IDs
-    const paths = deaths.map((death) => ({
-      params: { id: death.id.toString() },
-    }));
-  
-    return {
-      paths,
-      fallback: false,
-    };
-}
- 
 export async function getStaticProps({ locale }) {
     return {
       props: {

@@ -34,7 +34,7 @@ export default function LocaleSwitcher() {
                   height={23}
                   className="mr-2 rounded"
                 />
-              <span>{locale === "en" ? "English" : locale === "mm" ? "Myanmar" : null}</span>
+              <span className="sm:text-sm">{locale === "en" ? "English" : locale === "mm" ? "Myanmar" : null}</span>
                 
             </Link>
           </span>
