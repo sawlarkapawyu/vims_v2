@@ -2,10 +2,11 @@ import Head from 'next/head'
 import Sidebar from '@/components/admin/layouts/Sidebar'
 import Link from "next/link";
 import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/20/solid'
-import React, { useState, useEffect } from "react";
-import { FolderPlusIcon, PencilSquareIcon, TrashIcon } from '@heroicons/react/24/outline';
+import React, { useState, useEffect, useRef } from "react";
+import { BookOpenIcon, FolderPlusIcon, PencilSquareIcon, PrinterIcon, TrashIcon } from '@heroicons/react/24/outline';
 import { useUser, useSupabaseClient } from '@supabase/auth-helpers-react'
 import { useUserRoleCheck } from '/src/components/utilities/useUserRoleCheck.js';
+import { useReactToPrint } from 'react-to-print';
 
 import { useRouter } from 'next/router';
 import { formatDate, classNames } from '/src/components/utilities/tools.js';
@@ -115,7 +116,51 @@ export default function Disability() {
         }
     };
       
+    //Print start
+    const componentRef = useRef();
+    const handlePrint = useReactToPrint({
+        content: () => {
+          const table = componentRef.current;
+          const clonedTable = table.cloneNode(true);
+          const rows = clonedTable.getElementsByTagName('tr');
       
+          // Create a div element for the row
+          const rowElement = document.createElement('div');
+          rowElement.classList.add('flex', 'justify-between'); // Apply flex and justify-between classes to align the elements
+      
+          // Add page title
+          const titleElement = document.createElement('div');
+          titleElement.innerHTML = `<h1 class="py-4 px-8 font-semibold">${t("sidebar.Disabilities")}</h1>`; // Customize the page title as per your needs
+      
+          // Get current date
+          const currentDate = new Date().toLocaleDateString();
+      
+          // Create a div element for the current date
+          const dateElement = document.createElement('div');
+          dateElement.innerHTML = `<p class="py-4 px-8">${currentDate}</p>`;
+      
+          rowElement.appendChild(titleElement);
+          rowElement.appendChild(dateElement);
+      
+          const tableWrapper = document.createElement('div');
+          tableWrapper.classList.add('text-center'); // Center align the content
+          tableWrapper.appendChild(rowElement);
+          tableWrapper.appendChild(clonedTable);
+      
+          // Remove columns 12 and 13
+          for (let i = 0; i < rows.length; i++) {
+            const row = rows[i];
+            const cells = row.getElementsByTagName('td');
+            if (cells.length >= 12) {
+              row.removeChild(cells[11]); // Remove column 13 (Edit/Delete)
+              row.removeChild(cells[10]); // Remove column 12 (Address)
+            }
+          }
+      
+          return tableWrapper;
+        },
+    });
+    //Print end
 
     return (
         <>
@@ -130,13 +175,7 @@ export default function Disability() {
                 <div className="px-4 sm:px-6 lg:px-8">
                     {/* Breadcrumbs Start */}
                     <div className='py-2'>
-                        <nav className="sm:hidden" aria-label="Back">
-                            <a href="#" className="flex items-center text-sm font-medium text-gray-500 hover:text-gray-700">
-                                <ChevronLeftIcon className="flex-shrink-0 w-5 h-5 mr-1 -ml-1 text-gray-400" aria-hidden="true" />
-                                {t("other.Back")}
-                            </a>
-                            </nav>
-                            <nav className="hidden sm:flex" aria-label="Breadcrumb">
+                        <nav className="hidden sm:flex" aria-label="Breadcrumb">
                             <ol role="list" className="flex items-center space-x-4">
                                 <li>
                                 <div className="flex">
@@ -177,15 +216,15 @@ export default function Disability() {
                             <button
                                 type="button"
                                 onClick={handleRegisterClick}
-                                className="flex items-center justify-center px-2 py-2 text-sm font-semibold text-white rounded-md shadow-sm bg-sky-600 hover:bg-sky-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-600"
+                                className="flex items-center justify-center px-3 py-2 text-sm font-semibold text-white rounded-md shadow-sm bg-sky-600 hover:bg-sky-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-600"
                             >
                                 <FolderPlusIcon className="w-6 h-6 mr-2"></FolderPlusIcon>
                                 {t("Register")}
                             </button>
                         </div>
                     </div>
-                    <div className="flow-root mt-8">
-                        <div className="py-4 sm:grid sm:grid-cols-3 sm:gap-3">
+                    <div className="sm:flex sm:items-center">
+                        <div className="sm:flex-auto">
                             <div className="relative flex items-center mt-2">
                                 <input
                                 type="text"
@@ -202,13 +241,19 @@ export default function Disability() {
                                     </kbd>
                                 </div>
                             </div>
-                            
                         </div>
-                        
+                        <div className="mt-4 sm:ml-16 sm:mt-0 sm:flex-none">
+                            <p className="text-right text-gray-500">
+                                {t("filter.TotalResults")}: {filteredDisabilities.length}
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <div className="flow-root mt-8">
                         <div className="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
                             <div className="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
                                 
-                                <table className="min-w-full border-separate border-spacing-0">
+                                <table ref={componentRef} className="min-w-full border-separate border-spacing-0">
                                     <thead>
                                         <tr>
                                         <th
@@ -438,6 +483,16 @@ export default function Disability() {
                             </nav>
                             </div>
                         </div>
+                    </div>
+                    <div className="flex items-center mt-4">
+                        <button className="flex px-4 py-2 mr-2 text-white bg-blue-900 rounded-md">
+                            <PrinterIcon className="w-5 h-5 mr-2" />
+                            Print
+                        </button>
+                        <button className="flex px-4 py-2 text-white bg-blue-500 rounded-md">
+                            <BookOpenIcon className="w-5 h-5 mr-2" />
+                            Save as PDF
+                        </button>
                     </div>
                 </div>
             </Sidebar>

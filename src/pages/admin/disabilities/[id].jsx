@@ -91,10 +91,6 @@ export default function DisabilityEdit() {
         }
     };
 
-    const handleBackClick = () => {
-        router.push('/admin/disabilities');
-    };
-    
     const [newDisability, setNewDisability] = useState('');
     const [showModalDisability, setShowModalDisability] = useState(false);
     
@@ -150,6 +146,37 @@ export default function DisabilityEdit() {
         }
     };
 
+    const handleBackClick = () => {
+        router.push('/admin/disabilities');
+    };
+    
+    const handleCancel = () => {
+        const fetchDisabilityData = async () => {
+            const { data: disabilityData, error: disabilityError } = await supabase
+              .from('disabilities')
+              .select(`
+                id,
+                type,
+                description,
+                families (name, date_of_birth, nrc_id, gender, households (household_no, state_regions(name), townships(name), districts(name), ward_village_tracts(name), villages(name)))
+              `)
+              .eq('id', id)
+              .single();
+        
+            if (disabilityError) {
+              throw disabilityError;
+            }
+        
+            if (disabilityData) {
+              setSelectedDisabilityType([disabilityData.type]);
+              setDescription(disabilityData.description);
+              setDisabilities(disabilityData);
+            }
+          };
+            fetchDisabilityData();
+    };
+    
+
     
     return (
         <>
@@ -164,7 +191,7 @@ export default function DisabilityEdit() {
                 <div>
                     <div>
                         <nav className="sm:hidden" aria-label="Back">
-                        <a href="#" className="flex items-center text-sm font-medium text-gray-500 hover:text-gray-700">
+                        <a onClick={handleBackClick} href="#" className="flex items-center text-sm font-medium text-gray-500 hover:text-gray-700">
                             <ChevronLeftIcon className="flex-shrink-0 w-5 h-5 mr-1 -ml-1 text-gray-400" aria-hidden="true" />
                             {t("other.Back")}
                         </a>
@@ -203,20 +230,14 @@ export default function DisabilityEdit() {
                         {t("DisabilityRegistration")}
                         </h2>
                         </div>
-                        <div className="flex flex-shrink-0 mt-4 md:ml-4 md:mt-0">
-                        {/* <button
-                            type="button"
-                            className="inline-flex items-center px-3 py-2 text-sm font-semibold text-gray-900 bg-white rounded-md shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
-                        >
-                            Edit
-                        </button> */}
-                        <button
-                            type="button"
-                            onClick={handleBackClick}
-                            className="inline-flex items-center px-3 py-2 ml-3 text-sm font-semibold text-white rounded-md shadow-sm bg-sky-600 hover:bg-sky-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-600"
-                        >
-                            <ArrowUturnLeftIcon className="w-5 h-5 mr-2" /> {t("other.Back")}
-                        </button>
+                        <div className="flex-shrink-0 hidden mt-4 md:ml-4 md:mt-0 md:block">
+                            <button
+                                type="button"
+                                onClick={handleBackClick}
+                                className="inline-flex items-center px-3 py-2 ml-3 text-sm font-semibold text-white rounded-md shadow-sm bg-sky-600 hover:bg-sky-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-600"
+                            >
+                                <ArrowUturnLeftIcon className="w-5 h-5 mr-2" /> {t("other.Back")}
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -318,7 +339,7 @@ export default function DisabilityEdit() {
                             </div>
                         </div> 
                         <div className="flex items-center justify-end px-4 py-4 border-t gap-x-6 border-gray-900/10 sm:px-8">
-                            <button type="button" className="text-sm font-semibold leading-6 text-gray-900">
+                            <button onClick={handleCancel} type="button" className="text-sm font-semibold leading-6 text-gray-900">
                             {t("other.Cancel")}
                             </button>
                             <button

@@ -169,8 +169,6 @@ export default function HouseholdEdit() {
         }
     };
 
-
-
     const handleDistrictChange = async (event) => {
         const selectedDistrict = districts.find(
             (d) => d.id === parseInt(event.target.value));
@@ -247,270 +245,300 @@ export default function HouseholdEdit() {
         router.push('/admin/households');
     };
 
-  return (
-    <>
-        <Head>
-            <title>VIMS - Household Add</title>
-            <meta
-            name="description"
-            content="Most bookkeeping software is accurate, but hard to use. We make the opposite trade-off, and hope you don’t get audited."
-            />
-        </Head>
-        <Sidebar>
-            <div>
+    const handleCancel = () => {
+        const fetchHouseholdData = async () => {
+          const { data: householdData, error: householdError } = await supabase
+            .from('households')
+            .select(`
+              id,
+              entry_date,
+              household_no,
+              house_no,
+              state_regions (id, name),
+              districts (id, name),
+              townships (id, name),
+              ward_village_tracts (id, name),
+              villages (id, name)
+            `)
+            .eq('id', id)
+            .single();
+      
+          if (householdError) {
+            throw householdError;
+          }
+      
+          setEntryDate(householdData.entry_date);
+          setHouseholdId(householdData.household_no);
+          setHouseNo(householdData.house_no);
+          setSelectedStateRegion(householdData.state_regions);
+          setSelectedDistrict(householdData.districts);
+          setSelectedTownship(householdData.townships);
+          setSelectedWardVillageTract(householdData.ward_village_tracts);
+          setSelectedVillage(householdData.villages);
+        };
+      
+        fetchHouseholdData();
+    };
+      
+
+    return (
+        <>
+            <Head>
+                <title>VIMS - Household Add</title>
+                <meta
+                name="description"
+                content="Most bookkeeping software is accurate, but hard to use. We make the opposite trade-off, and hope you don’t get audited."
+                />
+            </Head>
+            <Sidebar>
                 <div>
-                    <nav className="sm:hidden" aria-label="Back">
-                    <a href="#" className="flex items-center text-sm font-medium text-gray-500 hover:text-gray-700">
-                        <ChevronLeftIcon className="flex-shrink-0 w-5 h-5 mr-1 -ml-1 text-gray-400" aria-hidden="true" />
-                        {t("other.Back")}
-                    </a>
-                    </nav>
-                    <nav className="hidden sm:flex" aria-label="Breadcrumb">
-                    <ol role="list" className="flex items-center space-x-4">
-                        <li>
-                        <div className="flex">
-                            <a href="#" className="text-sm font-medium text-gray-500 hover:text-gray-700">
-                            {t("other.Admin")}
-                            </a>
-                        </div>
-                        </li>
-                        <li>
-                        <div className="flex items-center">
-                            <ChevronRightIcon className="flex-shrink-0 w-5 h-5 text-gray-400" aria-hidden="true" />
-                            <a href="#" className="ml-4 text-sm font-medium text-gray-500 hover:text-gray-700">
-                                {t("sidebar.Households")}
-                            </a>
-                        </div>
-                        </li>
-                        <li>
-                        <div className="flex items-center">
-                            <ChevronRightIcon className="flex-shrink-0 w-5 h-5 text-gray-400" aria-hidden="true" />
-                            <a href="#" aria-current="page" className="ml-4 text-sm font-medium text-gray-500 hover:text-gray-700">
-                                {t("other.Edit")}
-                            </a>
-                        </div>
-                        </li>
-                        <li>
-                        <div className="flex items-center">
-                            <ChevronRightIcon className="flex-shrink-0 w-5 h-5 text-gray-400" aria-hidden="true" />
-                            <a href="#" aria-current="page" className="ml-4 text-sm font-medium text-gray-500 hover:text-gray-700">
-                            {householdId}
-                            </a>
-                        </div>
-                        </li>
-                    </ol>
-                    </nav>
-                </div>
-                <div className="mt-2 md:flex md:items-center md:justify-between">
-                    <div className="flex-1 min-w-0">
-                    <h2 className="py-4 text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:text-3xl sm:tracking-tight">
-                        {t("sidebar.Households")}
-                    </h2>
+                    <div>
+                        <nav className="sm:hidden" aria-label="Back">
+                        <a onClick={handleBackClick} href="#" className="flex items-center text-sm font-medium text-gray-500 hover:text-gray-700">
+                            <ChevronLeftIcon className="flex-shrink-0 w-5 h-5 mr-1 -ml-1 text-gray-400" aria-hidden="true" />
+                            {t("other.Back")}
+                        </a>
+                        </nav>
+                        <nav className="hidden sm:flex" aria-label="Breadcrumb">
+                        <ol role="list" className="flex items-center space-x-4">
+                            <li>
+                            <div className="flex">
+                                <a href="#" className="text-sm font-medium text-gray-500 hover:text-gray-700">
+                                {t("other.Admin")}
+                                </a>
+                            </div>
+                            </li>
+                            <li>
+                            <div className="flex items-center">
+                                <ChevronRightIcon className="flex-shrink-0 w-5 h-5 text-gray-400" aria-hidden="true" />
+                                <a href="#" className="ml-4 text-sm font-medium text-gray-500 hover:text-gray-700">
+                                    {t("sidebar.Households")}
+                                </a>
+                            </div>
+                            </li>
+                            <li>
+                            <div className="flex items-center">
+                                <ChevronRightIcon className="flex-shrink-0 w-5 h-5 text-gray-400" aria-hidden="true" />
+                                <a href="#" aria-current="page" className="ml-4 text-sm font-medium text-gray-500 hover:text-gray-700">
+                                    {t("other.Edit")}
+                                </a>
+                            </div>
+                            </li>
+                            <li>
+                            <div className="flex items-center">
+                                <ChevronRightIcon className="flex-shrink-0 w-5 h-5 text-gray-400" aria-hidden="true" />
+                                <a href="#" aria-current="page" className="ml-4 text-sm font-medium text-gray-500 hover:text-gray-700">
+                                {householdId}
+                                </a>
+                            </div>
+                            </li>
+                        </ol>
+                        </nav>
                     </div>
-                    <div className="flex flex-shrink-0 mt-2 md:ml-4 md:mt-0">
-                    {/* <button
-                        type="button"
-                        className="inline-flex items-center px-3 py-2 text-sm font-semibold text-gray-900 bg-white rounded-md shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
-                    >
-                        Edit
-                    </button> */}
-                    <button
-                        type="button"
-                        onClick={handleBackClick}
-                        className="inline-flex items-center px-3 py-2 ml-3 text-sm font-semibold text-white rounded-md shadow-sm bg-sky-600 hover:bg-sky-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-600"
-                    >
-                        <ArrowUturnLeftIcon className="w-5 h-5 mr-2" /> {t("other.Back")}
-                    </button>
+                    <div className="mt-2 md:flex md:items-center md:justify-between">
+                        <div className="flex-1 min-w-0">
+                        <h2 className="py-4 text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:text-3xl sm:tracking-tight">
+                            {t("sidebar.Households")}
+                        </h2>
+                        </div>
+                        <div className="flex-shrink-0 hidden mt-2 md:ml-4 md:mt-0 md:block">
+                            <button
+                                type="button"
+                                onClick={handleBackClick}
+                                className="inline-flex items-center px-3 py-2 ml-3 text-sm font-semibold text-white rounded-md shadow-sm bg-sky-600 hover:bg-sky-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-600"
+                            >
+                                <ArrowUturnLeftIcon className="w-5 h-5 mr-2" /> {t("other.Back")}
+                            </button>
+                        </div>
                     </div>
                 </div>
-            </div>
-            
-            <div className="grid grid-cols-1 pt-10 gap-x-8 gap-y-8 md:grid-cols-3">
-                <form onSubmit={handleEditHousehold} className="bg-white shadow-sm ring-1 ring-gray-900/5 sm:rounded-xl md:col-span-3">
-                    <div className="grid grid-cols-1 px-3 py-3 md:grid-cols-3"> {/* Updated className */}
-                        <div className="col-span-1 px-3 py-3 mt-3 md:col-span-1">
-                            <label htmlFor="householdId" className="block text-sm font-medium leading-6 text-gray-900">
-                                {t("HouseholdNo")}
-                            </label>
-                            <div className="mt-2">
-                                <input
-                                    type="text"
-                                    id="householdId"
-                                    value={householdId}
-                                    onChange={(e) => setHouseholdId(e.target.value)}
-                                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-sky-600 sm:text-sm sm:leading-6"
-                                />
+                
+                <div className="grid grid-cols-1 pt-10 gap-x-8 gap-y-8 md:grid-cols-3">
+                    <form onSubmit={handleEditHousehold} className="bg-white shadow-sm ring-1 ring-gray-900/5 sm:rounded-xl md:col-span-3">
+                        <div className="grid grid-cols-1 px-3 py-3 md:grid-cols-3"> {/* Updated className */}
+                            <div className="col-span-1 px-3 py-3 mt-3 md:col-span-1">
+                                <label htmlFor="householdId" className="block text-sm font-medium leading-6 text-gray-900">
+                                    {t("HouseholdNo")}
+                                </label>
+                                <div className="mt-2">
+                                    <input
+                                        type="text"
+                                        id="householdId"
+                                        value={householdId}
+                                        onChange={(e) => setHouseholdId(e.target.value)}
+                                        className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-sky-600 sm:text-sm sm:leading-6"
+                                    />
+                                </div>
                             </div>
-                        </div>
 
-                        <div className="col-span-1 px-3 py-3 mt-3 md:col-span-1">
-                            <label htmlFor="entryDate" className="block text-sm font-medium leading-6 text-gray-900">
-                                {t("EntryDate")}
-                            </label>
-                            <div className="mt-2">
-                                <input
-                                    type="date"
-                                    id="entryDate"
-                                    value={getDateValue(entryDate)}
-                                    onChange={(e) => setEntryDate(e.target.value)}
-                                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-sky-600 sm:text-sm sm:leading-6"
-                                />
+                            <div className="col-span-1 px-3 py-3 mt-3 md:col-span-1">
+                                <label htmlFor="entryDate" className="block text-sm font-medium leading-6 text-gray-900">
+                                    {t("EntryDate")}
+                                </label>
+                                <div className="mt-2">
+                                    <input
+                                        type="date"
+                                        id="entryDate"
+                                        value={getDateValue(entryDate)}
+                                        onChange={(e) => setEntryDate(e.target.value)}
+                                        className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-sky-600 sm:text-sm sm:leading-6"
+                                    />
+                                </div>
                             </div>
-                        </div>
 
-                        <div className="col-span-1 px-3 py-3 mt-3 md:col-span-1">
-                            <label htmlFor="houseNo" className="block text-sm font-medium leading-6 text-gray-900">
-                                {t("HouseNo")}
-                            </label>
-                            <div className="mt-2">
-                                <input
-                                    type="text"
-                                    id="houseNo"
-                                    value={houseNo}
-                                    onChange={(e) => setHouseNo(e.target.value)}
-                                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-sky-600 sm:text-sm sm:leading-6"
-                                />
+                            <div className="col-span-1 px-3 py-3 mt-3 md:col-span-1">
+                                <label htmlFor="houseNo" className="block text-sm font-medium leading-6 text-gray-900">
+                                    {t("HouseNo")}
+                                </label>
+                                <div className="mt-2">
+                                    <input
+                                        type="text"
+                                        id="houseNo"
+                                        value={houseNo}
+                                        onChange={(e) => setHouseNo(e.target.value)}
+                                        className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-sky-600 sm:text-sm sm:leading-6"
+                                    />
+                                </div>
                             </div>
-                        </div>
 
-                        <div className="col-span-1 px-3 py-3 mt-3 md:col-span-1">
-                            <label htmlFor="stateRegions" className="block text-sm font-medium leading-6 text-gray-900">
-                                {t("StateRegions")}
-                            </label>
-                            <div className="mt-2">
-                                <select 
-                                    id="stateRegions"
-                                    value={selectedStateRegion ? selectedStateRegion.id : ""}
-                                    onChange={handleStateRegionChange} 
-                                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-sky-600 sm:text-sm sm:leading-6">
+                            <div className="col-span-1 px-3 py-3 mt-3 md:col-span-1">
+                                <label htmlFor="stateRegions" className="block text-sm font-medium leading-6 text-gray-900">
+                                    {t("StateRegions")}
+                                </label>
+                                <div className="mt-2">
+                                    <select 
+                                        id="stateRegions"
+                                        value={selectedStateRegion ? selectedStateRegion.id : ""}
+                                        onChange={handleStateRegionChange} 
+                                        className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-sky-600 sm:text-sm sm:leading-6">
+                                        <option value="">{t("other.Choose")}</option>
+                                        {stateRegions.map((sr) => (
+                                        <option key={sr.id} value={sr.id}>
+                                            {sr.name}
+                                        </option>
+                                        ))}
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div className="col-span-1 px-3 py-3 mt-3 md:col-span-1">
+                                <label htmlFor="districts" className="block text-sm font-medium leading-6 text-gray-900">
+                                    {t("Districts")}
+                                </label>
+                                <div className="mt-2">
+                                    <select
+                                    id="districts"
+                                    value={selectedDistrict ? selectedDistrict.id : ""}
+                                    onChange={handleDistrictChange}
+                                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-sky-600 sm:text-sm sm:leading-6"
+                                    >
                                     <option value="">{t("other.Choose")}</option>
-                                    {stateRegions.map((sr) => (
-                                    <option key={sr.id} value={sr.id}>
-                                        {sr.name}
-                                    </option>
-                                    ))}
-                                </select>
-                            </div>
-                        </div>
-
-                        <div className="col-span-1 px-3 py-3 mt-3 md:col-span-1">
-                            <label htmlFor="districts" className="block text-sm font-medium leading-6 text-gray-900">
-                                {t("Districts")}
-                            </label>
-                            <div className="mt-2">
-                                <select
-                                id="districts"
-                                value={selectedDistrict ? selectedDistrict.id : ""}
-                                onChange={handleDistrictChange}
-                                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-sky-600 sm:text-sm sm:leading-6"
-                                >
-                                <option value="">{t("other.Choose")}</option>
-                                {selectedDistrict && (
-                                    <option key={selectedDistrict.id} value={selectedDistrict.id}>
-                                    {selectedDistrict.name}
-                                    </option>
-                                )}
-                                {districts.map((district) => (
-                                    <option key={district.id} value={district.id}>
-                                    {district.name}
-                                    </option>
-                                ))}
-                                </select>
-                            </div>
-                        </div>
-
-                        <div className="col-span-1 px-3 py-3 mt-3 md:col-span-1">
-                            <label htmlFor="townships" className="block text-sm font-medium leading-6 text-gray-900">
-                                {t("Townships")}
-                            </label>
-                            <div className="mt-2">
-                                <select 
-                                    id="townships"
-                                    value={selectedTownship ? selectedTownship.id: ""}
-                                    onChange={handleTownshipChange} 
-                                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-sky-600 sm:text-sm sm:leading-6">
-                                    <option value="">{t("other.Choose")}</option>
-                                    {selectedTownship && (
-                                        <option key={selectedTownship.id} value={selectedTownship.id}>
-                                        {selectedTownship.name}
+                                    {selectedDistrict && (
+                                        <option key={selectedDistrict.id} value={selectedDistrict.id}>
+                                        {selectedDistrict.name}
                                         </option>
                                     )}
-                                    {townships.map((t) => (
-                                    <option key={t.id} value={t.id}>
-                                        {t.name}
-                                    </option>
-                                    ))}
-                                </select>
-                            </div>
-                        </div>
-
-                        <div className="col-span-1 px-3 py-3 mt-3 md:col-span-1">
-                            <label htmlFor="wardVillageTracts" className="block text-sm font-medium leading-6 text-gray-900">
-                                {t("WardVillageTracts")}
-                            </label>
-                            <div className="mt-2">
-                                <select 
-                                    id="wardVillageTracts"
-                                    value={selectedWardVillageTract ? selectedWardVillageTract.id : ""}
-                                    onChange={handleWardVillageTractChange} 
-                                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-sky-600 sm:text-sm sm:leading-6">
-                                    <option value="">{t("other.Choose")}</option>
-                                    {selectedWardVillageTract && (
-                                        <option key={selectedWardVillageTract.id} value={selectedWardVillageTract.id}>
-                                        {selectedWardVillageTract.name}
+                                    {districts.map((district) => (
+                                        <option key={district.id} value={district.id}>
+                                        {district.name}
                                         </option>
-                                    )}
-                                    {wardVillageTracts.map((wvt) => (
-                                    <option key={wvt.id} value={wvt.id}>
-                                        {wvt.name}
-                                    </option>
                                     ))}
-                                </select>
+                                    </select>
+                                </div>
                             </div>
-                        </div>
 
-                        <div className="col-span-1 px-3 py-3 mt-3 md:col-span-1">
-                            <label htmlFor="selectedVillage" className="block text-sm font-medium leading-6 text-gray-900">
-                                {t("Villages")}
-                            </label>
-                            <div className="mt-2">
-                                <select 
-                                    id="selectedVillage"
-                                    value={selectedVillage ? selectedVillage.id : ""}
-                                    onChange={handleVillageChange} 
-                                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-sky-600 sm:text-sm sm:leading-6">
-                                    <option value="">{t("other.Choose")}</option>
-                                    {selectedVillage && (
-                                        <option key={selectedVillage.id} value={selectedVillage.id}>
-                                        {selectedVillage.name}
+                            <div className="col-span-1 px-3 py-3 mt-3 md:col-span-1">
+                                <label htmlFor="townships" className="block text-sm font-medium leading-6 text-gray-900">
+                                    {t("Townships")}
+                                </label>
+                                <div className="mt-2">
+                                    <select 
+                                        id="townships"
+                                        value={selectedTownship ? selectedTownship.id: ""}
+                                        onChange={handleTownshipChange} 
+                                        className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-sky-600 sm:text-sm sm:leading-6">
+                                        <option value="">{t("other.Choose")}</option>
+                                        {selectedTownship && (
+                                            <option key={selectedTownship.id} value={selectedTownship.id}>
+                                            {selectedTownship.name}
+                                            </option>
+                                        )}
+                                        {townships.map((t) => (
+                                        <option key={t.id} value={t.id}>
+                                            {t.name}
                                         </option>
-                                    )}
-                                    {villages.map((v) => (
-                                    <option key={v.id} value={v.id}>
-                                        {v.name}
-                                    </option>
-                                    ))}
-                                </select>
+                                        ))}
+                                    </select>
+                                </div>
                             </div>
-                        </div>
 
-                    </div>
-                    <div className="flex items-center justify-end px-4 py-4 border-t gap-x-6 border-gray-900/10 sm:px-8">
-                        <button type="button" className="text-sm font-semibold leading-6 text-gray-900">
-                            {t("other.Cancel")}
-                        </button>
-                        <button
-                        type="submit"
-                        className="px-3 py-2 text-sm font-semibold text-white rounded-md shadow-sm bg-sky-600 hover:bg-sky-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-600"
-                        >
-                            {t("other.Submit")}
-                        </button>
-                    </div>  
-                </form>
-            </div>
-        </Sidebar>
-    </>
-  );
+                            <div className="col-span-1 px-3 py-3 mt-3 md:col-span-1">
+                                <label htmlFor="wardVillageTracts" className="block text-sm font-medium leading-6 text-gray-900">
+                                    {t("WardVillageTracts")}
+                                </label>
+                                <div className="mt-2">
+                                    <select 
+                                        id="wardVillageTracts"
+                                        value={selectedWardVillageTract ? selectedWardVillageTract.id : ""}
+                                        onChange={handleWardVillageTractChange} 
+                                        className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-sky-600 sm:text-sm sm:leading-6">
+                                        <option value="">{t("other.Choose")}</option>
+                                        {selectedWardVillageTract && (
+                                            <option key={selectedWardVillageTract.id} value={selectedWardVillageTract.id}>
+                                            {selectedWardVillageTract.name}
+                                            </option>
+                                        )}
+                                        {wardVillageTracts.map((wvt) => (
+                                        <option key={wvt.id} value={wvt.id}>
+                                            {wvt.name}
+                                        </option>
+                                        ))}
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div className="col-span-1 px-3 py-3 mt-3 md:col-span-1">
+                                <label htmlFor="selectedVillage" className="block text-sm font-medium leading-6 text-gray-900">
+                                    {t("Villages")}
+                                </label>
+                                <div className="mt-2">
+                                    <select 
+                                        id="selectedVillage"
+                                        value={selectedVillage ? selectedVillage.id : ""}
+                                        onChange={handleVillageChange} 
+                                        className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-sky-600 sm:text-sm sm:leading-6">
+                                        <option value="">{t("other.Choose")}</option>
+                                        {selectedVillage && (
+                                            <option key={selectedVillage.id} value={selectedVillage.id}>
+                                            {selectedVillage.name}
+                                            </option>
+                                        )}
+                                        {villages.map((v) => (
+                                        <option key={v.id} value={v.id}>
+                                            {v.name}
+                                        </option>
+                                        ))}
+                                    </select>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div className="flex items-center justify-end px-4 py-4 border-t gap-x-6 border-gray-900/10 sm:px-8">
+                            <button onClick={handleCancel} type="button" className="text-sm font-semibold leading-6 text-gray-900">
+                                {t("other.Cancel")}
+                            </button>
+                            <button
+                            type="submit"
+                            className="px-3 py-2 text-sm font-semibold text-white rounded-md shadow-sm bg-sky-600 hover:bg-sky-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-600"
+                            >
+                                {t("other.Submit")}
+                            </button>
+                        </div>  
+                    </form>
+                </div>
+            </Sidebar>
+        </>
+    );
 }
 
 export async function getStaticProps({ locale }) {

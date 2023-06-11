@@ -2,11 +2,11 @@ import Head from 'next/head'
 import Sidebar from '@/components/admin/layouts/Sidebar'
 import Link from "next/link";
 import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/20/solid'
-import React, { useState, useEffect } from "react";
-import { FolderPlusIcon, PencilSquareIcon, TrashIcon } from '@heroicons/react/24/outline';
+import React, { useState, useEffect, useRef } from "react";
+import { BookOpenIcon, FolderPlusIcon, PencilSquareIcon, PrinterIcon, TrashIcon } from '@heroicons/react/24/outline';
 import { useUser, useSupabaseClient } from '@supabase/auth-helpers-react'
 import { useUserRoleCheck } from '/src/components/utilities/useUserRoleCheck.js';
-
+import { useReactToPrint } from 'react-to-print';
 import { useRouter } from 'next/router';
 import { formatDate, classNames } from '/src/components/utilities/tools.js';
 
@@ -23,7 +23,6 @@ export default function Deaths() {
     const [deaths, setDeaths] = useState([]);
     
     useUserRoleCheck();
-    
     
     useEffect(() => {
         fetchDeaths();
@@ -94,28 +93,6 @@ export default function Deaths() {
     }
     };
     // Pagination End
-
-   
-    // const [families, setFamilies] = useState([]);
-    // useEffect(() => {
-    //     fetchFamilies();
-    //   }, []);
-      
-    //   const fetchFamilies = async () => {
-    //     try {
-    //       const { data: familiesData, error: familiesError } = await supabase
-    //         .from('families')
-    //         .select('*');
-      
-    //       if (familiesError) {
-    //         throw new Error(familiesError.message);
-    //       }
-      
-    //       setFamilies(familiesData);
-    //     } catch (error) {
-    //       console.error('Error fetching families:', error);
-    //     }
-    // };
     
     //Delete    
     const handleDeleteDeath = async (familyId) => {
@@ -154,7 +131,52 @@ export default function Deaths() {
           }
         }
     };
+    
+    //Print start
+    const componentRef = useRef();
+    const handlePrint = useReactToPrint({
+        content: () => {
+          const table = componentRef.current;
+          const clonedTable = table.cloneNode(true);
+          const rows = clonedTable.getElementsByTagName('tr');
       
+          // Create a div element for the row
+          const rowElement = document.createElement('div');
+          rowElement.classList.add('flex', 'justify-between'); // Apply flex and justify-between classes to align the elements
+      
+          // Add page title
+          const titleElement = document.createElement('div');
+          titleElement.innerHTML = `<h1 class="py-4 px-8 font-semibold">${t("sidebar.Deaths")}</h1>`; // Customize the page title as per your needs
+      
+          // Get current date
+          const currentDate = new Date().toLocaleDateString();
+      
+          // Create a div element for the current date
+          const dateElement = document.createElement('div');
+          dateElement.innerHTML = `<p class="py-4 px-8">${currentDate}</p>`;
+      
+          rowElement.appendChild(titleElement);
+          rowElement.appendChild(dateElement);
+      
+          const tableWrapper = document.createElement('div');
+          tableWrapper.classList.add('text-center'); // Center align the content
+          tableWrapper.appendChild(rowElement);
+          tableWrapper.appendChild(clonedTable);
+      
+          // Remove columns 12 and 13
+          for (let i = 0; i < rows.length; i++) {
+            const row = rows[i];
+            const cells = row.getElementsByTagName('td');
+            if (cells.length >= 14) {
+              row.removeChild(cells[13]); // Remove column 13 (Edit/Delete)
+              row.removeChild(cells[12]); // Remove column 12 (Address)
+            }
+          }
+      
+          return tableWrapper;
+        },
+    });
+    //Print end
       
       
       
@@ -172,13 +194,7 @@ export default function Deaths() {
                 <div className="px-4 sm:px-6 lg:px-8">
                     {/* Breadcrumbs Start */}
                     <div className='py-2'>
-                        <nav className="sm:hidden" aria-label="Back">
-                            <a href="#" className="flex items-center text-sm font-medium text-gray-500 hover:text-gray-700">
-                                <ChevronLeftIcon className="flex-shrink-0 w-5 h-5 mr-1 -ml-1 text-gray-400" aria-hidden="true" />
-                                {t("other.Back")}
-                            </a>
-                            </nav>
-                            <nav className="hidden sm:flex" aria-label="Breadcrumb">
+                        <nav className="hidden sm:flex" aria-label="Breadcrumb">
                             <ol role="list" className="flex items-center space-x-4">
                                 <li>
                                 <div className="flex">
@@ -219,7 +235,7 @@ export default function Deaths() {
                             <button
                                 type="button"
                                 onClick={handleRegisterClick}
-                                className="flex items-center justify-center px-2 py-2 text-sm font-semibold text-white rounded-md shadow-sm bg-sky-600 hover:bg-sky-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-600"
+                                className="flex items-center justify-center px-3 py-2 text-sm font-semibold text-white rounded-md shadow-sm bg-sky-600 hover:bg-sky-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-600"
                             >
                             <FolderPlusIcon className="w-6 h-6 mr-2"></FolderPlusIcon>
                             {t("Register")}
@@ -227,30 +243,36 @@ export default function Deaths() {
                         </div>
                     </div>
                     <div className="flow-root mt-8">
-                        <div className="py-4 sm:grid sm:grid-cols-3 sm:gap-3">
-                            <div className="relative flex items-center mt-2">
-                                <input
-                                type="text"
-                                name="search"
-                                id="search"
-                                placeholder={t("filter.Search")}
-                                value={searchQuery}
-                                onChange={(e) => setSearchQuery(e.target.value)}
-                                className="block w-full rounded-md border-0 py-1.5 pr-14 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-sky-600 sm:text-sm sm:leading-6"
-                                />
-                                <div className="absolute inset-y-0 right-0 flex py-1.5 pr-1.5">
-                                    <kbd className="inline-flex items-center px-1 font-sans text-xs text-gray-400 border border-gray-200 rounded">
-                                        ⌘K
-                                    </kbd>
+                        <div className="sm:flex sm:items-center">
+                            <div className="sm:flex-auto">
+                                <div className="relative flex items-center mt-2">
+                                    <input
+                                    type="text"
+                                    name="search"
+                                    id="search"
+                                    placeholder={t("filter.Search")}
+                                    value={searchQuery}
+                                    onChange={(e) => setSearchQuery(e.target.value)}
+                                    className="block w-full rounded-md border-0 py-1.5 pr-14 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-sky-600 sm:text-sm sm:leading-6"
+                                    />
+                                    <div className="absolute inset-y-0 right-0 flex py-1.5 pr-1.5">
+                                        <kbd className="inline-flex items-center px-1 font-sans text-xs text-gray-400 border border-gray-200 rounded">
+                                            ⌘K
+                                        </kbd>
+                                    </div>
                                 </div>
                             </div>
-                            
+                            <div className="mt-4 sm:ml-16 sm:mt-0 sm:flex-none">
+                                <p className="text-right text-gray-500">
+                                    {t("filter.TotalResults")}: {filteredDeaths.length}
+                                </p>
+                            </div>
                         </div>
                         
                         <div className="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
-                            <div className="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
+                            <div  className="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
                                 
-                                <table className="min-w-full border-separate border-spacing-0">
+                                <table ref={componentRef} className="min-w-full border-separate border-spacing-0">
                                     <thead>
                                         <tr>
                                         <th
@@ -281,12 +303,6 @@ export default function Deaths() {
                                             scope="col"
                                             className="sticky top-0 z-10 border-b border-gray-300 bg-white bg-opacity-75 py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 backdrop-blur backdrop-filter sm:pl-6 lg:pl-8"
                                         >
-                                            {t("Age")}
-                                        </th>
-                                        <th
-                                            scope="col"
-                                            className="sticky top-0 z-10 border-b border-gray-300 bg-white bg-opacity-75 py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 backdrop-blur backdrop-filter sm:pl-6 lg:pl-8"
-                                        >
                                             {t("NRC")}
                                         </th>
                                         <th
@@ -294,6 +310,12 @@ export default function Deaths() {
                                             className="sticky top-0 z-10 border-b border-gray-300 bg-white bg-opacity-75 py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 backdrop-blur backdrop-filter sm:pl-6 lg:pl-8"
                                         >
                                             {t("DeathDate")}
+                                        </th>
+                                        <th
+                                            scope="col"
+                                            className="sticky top-0 z-10 border-b border-gray-300 bg-white bg-opacity-75 py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 backdrop-blur backdrop-filter sm:pl-6 lg:pl-8"
+                                        >
+                                            {t("DeathAge")}
                                         </th>
                                         <th
                                             scope="col"
@@ -387,17 +409,6 @@ export default function Deaths() {
                                                 'whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6 lg:pl-8'
                                             )}
                                             >
-                                                {Math.floor(
-                                                (new Date() - new Date(death.families.date_of_birth)) /
-                                                    (365.25 * 24 * 60 * 60 * 1000)
-                                                )}
-                                            </td>
-                                            <td
-                                            className={classNames(
-                                                deathIdx !== deaths.length - 1 ? 'border-b border-gray-200' : '',
-                                                'whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6 lg:pl-8'
-                                            )}
-                                            >
                                             {death.families.nrc_id}
                                             </td>
                                             <td
@@ -408,6 +419,18 @@ export default function Deaths() {
                                             >
                                             {new Date(death.death_date).toLocaleDateString()}
                                             </td>
+                                            <td
+                                                className={classNames(
+                                                    deathIdx !== deaths.length - 1 ? 'border-b border-gray-200' : '',
+                                                    'whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6 lg:pl-8'
+                                                )}
+                                                >
+                                                {Math.floor(
+                                                    (new Date(death.death_date) - new Date(death.families.date_of_birth)) /
+                                                    (365.25 * 24 * 60 * 60 * 1000)
+                                                )}
+                                            </td>
+
                                             <td
                                             className={classNames(
                                                 deathIdx !== deaths.length - 1 ? 'border-b border-gray-200' : '',
@@ -478,7 +501,6 @@ export default function Deaths() {
                                 )}
                                 </tbody>
                             </table>
-
                             {/* Pagination */}
                             <nav className="flex items-center justify-between px-4 py-3 bg-white border-t border-gray-200 sm:px-6" aria-label="Pagination">
                                 <div className="hidden sm:block">
@@ -505,10 +527,22 @@ export default function Deaths() {
                                 </button>
                                 </div>
                             </nav>
+                            
                             </div>
                         </div>
                     </div>
+                    <div className="flex items-center mt-4">
+                        <button className="flex px-4 py-2 mr-2 text-white bg-blue-900 rounded-md">
+                            <PrinterIcon className="w-5 h-5 mr-2" />
+                            Print
+                        </button>
+                        <button className="flex px-4 py-2 text-white bg-blue-500 rounded-md">
+                            <BookOpenIcon className="w-5 h-5 mr-2" />
+                            Save as PDF
+                        </button>
+                    </div>
                 </div>
+                
             </Sidebar>
         
         </>

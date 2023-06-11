@@ -1,6 +1,7 @@
 import Head from 'next/head'
 import Sidebar from '@/components/admin/layouts/Sidebar'
 import Reports from '@/components/admin/Report'
+
 import { ChevronRightIcon, ChevronLeftIcon } from '@heroicons/react/24/outline';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { useTranslation } from "next-i18next";
@@ -22,13 +23,7 @@ export default function Home() {
             <div className="md:flex md:items-center md:justify-between">
                 {/* Breadcrumbs Start */}
                 <div className='py-2'>
-                    <nav className="sm:hidden" aria-label="Back">
-                        <a href="#" className="flex items-center text-sm font-medium text-gray-500 hover:text-gray-700">
-                            <ChevronLeftIcon className="flex-shrink-0 w-5 h-5 mr-1 -ml-1 text-gray-400" aria-hidden="true" />
-                            {t("other.Back")}
-                        </a>
-                        </nav>
-                        <nav className="hidden sm:flex" aria-label="Breadcrumb">
+                    <nav className="hidden sm:flex" aria-label="Breadcrumb">
                         <ol role="list" className="flex items-center space-x-4">
                             <li>
                             <div className="flex">

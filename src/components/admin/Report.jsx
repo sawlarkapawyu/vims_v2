@@ -9,7 +9,7 @@ import { supabase } from "/src/components/utilities/supabase";
 import DropdownSelect from 'react-dropdown-select';
 import { formatDate, classNames } from '/src/components/utilities/tools.js';
 import { useTranslation } from "next-i18next";
-import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
+import { BookOpenIcon, ChevronLeftIcon, ChevronRightIcon, PrinterIcon } from '@heroicons/react/24/outline';
 
 const Report = () => {
     // const supabase = useSupabaseClient();
@@ -179,32 +179,6 @@ const Report = () => {
           console.log('Error fetching resident:', error.message);
         }
     }
-
-      
-    // async function fetchResident() {
-    //     try {
-    //       const { data, error } = await supabase
-    //         .from('families')
-    //         .select('id, name, resident');
-          
-    //       if (error) {
-    //         throw new Error(error.message);
-    //       }
-      
-    //       // Extract unique resident values
-    //       const uniqueResident = [...new Set(data.map(family => family.resident))];
-      
-    //       // Group families by the resident property
-    //       const groupedFamilies = uniqueResident.reduce((groups, residentValue) => {
-    //         groups[residentValue] = data.filter(family => family.resident === residentValue);
-    //         return groups;
-    //       }, {});
-      
-    //       setResident(groupedFamilies);
-    //     } catch (error) {
-    //       console.log('Error fetching resident:', error.message);
-    //     }
-    // }
     
     async function fetchDeaths() {
         try {
@@ -229,25 +203,6 @@ const Report = () => {
         }
     }
 
-      
-    // async function fetchDeaths() {
-    //     try {
-    //       const { data, error } = await supabase
-    //       .from('families')
-    //       .select('isDeath');
-      
-    //       if (error) {
-    //         throw new Error(error.message);
-    //       }
-      
-    //       const uniqueDeaths = [...new Set(data.map((row) => row.isDeath))];
-      
-    //       setDeaths(uniqueDeaths);
-    //     } catch (error) {
-    //       console.log('Error fetching deaths:', error.message);
-    //     }
-    // }
-
     async function fetchGenders() {
         try {
           const { data, error } = await supabase
@@ -269,27 +224,7 @@ const Report = () => {
         } catch (error) {
           console.log('Error fetching gender:', error.message);
         }
-      }
-
-      
-    // async function fetchGenders() {
-    //     try {
-    //       const { data, error } = await supabase
-    //       .from('families')
-    //       .select('gender');
-      
-    //       if (error) {
-    //         throw new Error(error.message);
-    //       }
-      
-    //       // Extract unique gender values by filtering out duplicates
-    //       const uniqueGenders = [...new Set(data.map((row) => row.gender))];
-      
-    //       setGenders(uniqueGenders);
-    //     } catch (error) {
-    //       console.log('Error fetching gender:', error.message);
-    //     }
-    // }
+    }
     
     async function fetchOccupation() {
         try {
@@ -540,20 +475,41 @@ const Report = () => {
         setShowFilter(!showFilter);
     };
 
-    //Print and save pdf
+    //Print start
     const componentRef = useRef();
     const handlePrint = useReactToPrint({
-        content: () => componentRef.current,
+        content: () => {
+          const table = componentRef.current;
+          const clonedTable = table.cloneNode(true);
+          const rows = clonedTable.getElementsByTagName('tr');
+      
+          // Create a div element for the row
+          const rowElement = document.createElement('div');
+          rowElement.classList.add('flex', 'justify-between'); // Apply flex and justify-between classes to align the elements
+      
+          // Add page title
+          const titleElement = document.createElement('div');
+          titleElement.innerHTML = `<h1 class="py-4 px-8 font-semibold">${t("sidebar.Reports")}</h1>`; // Customize the page title as per your needs
+      
+          // Get current date
+          const currentDate = new Date().toLocaleDateString();
+      
+          // Create a div element for the current date
+          const dateElement = document.createElement('div');
+          dateElement.innerHTML = `<p class="py-4 px-8">${currentDate}</p>`;
+      
+          rowElement.appendChild(titleElement);
+          rowElement.appendChild(dateElement);
+      
+          const tableWrapper = document.createElement('div');
+          tableWrapper.classList.add('text-center'); // Center align the content
+          tableWrapper.appendChild(rowElement);
+          tableWrapper.appendChild(clonedTable);
+      
+          return tableWrapper;
+        },
     });
-
-    const handleSaveAsPdf = () => {
-        const doc = new jsPDF();
-        doc.autoTable({
-          head: [['Name', 'Age', 'School']],
-          body: filterFamilies.map((item) => [item.name, item.age, item.school]),
-        });
-        doc.save('table.pdf');
-    };
+    //Print end
 
     return (
         <div className='py-4'>
@@ -794,7 +750,7 @@ const Report = () => {
             <div className="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
                 <div className="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
                    
-                    <table className="min-w-full border-separate border-spacing-0">
+                    <table ref={componentRef} className="min-w-full border-separate border-spacing-0">
                         <thead className='bg-gray-300'>
                             <tr>
                                 <th
@@ -988,50 +944,16 @@ const Report = () => {
                 </div>
             </div>
             <div className="flex items-center mt-4">
-                <button
-                    onClick={handlePrint}
-                    className="px-4 py-2 mr-2 text-white bg-blue-900 rounded-md"
-                >
+                <button className="flex px-4 py-2 mr-2 text-white bg-blue-900 rounded-md">
+                    <PrinterIcon className="w-5 h-5 mr-2" />
                     Print
                 </button>
-                <button
-                    onClick={handleSaveAsPdf}
-                    className="px-4 py-2 text-white bg-blue-500 rounded-md"
-                >
+                <button className="flex px-4 py-2 text-white bg-blue-500 rounded-md">
+                    <BookOpenIcon className="w-5 h-5 mr-2" />
                     Save as PDF
                 </button>
             </div>
-
-        {/* Hidden component for printing */}
-        {/* <div style={{ display: 'none' }}>
-            <ComponentToPrint ref={componentRef} data={filterFamilies} totalResults={filterFamilies.length} />
-        </div> */}
-    </div>
+        </div>
     );
 };
-
-// const ComponentToPrint = React.forwardRef(({ data, totalResults }, ref) => (
-//     <div ref={ref}>
-//       <h2>Total Results: {totalResults}</h2>
-//       <table>
-//         <thead>
-//           <tr>
-//             <th>Name</th>
-//             <th>Age</th>
-//             <th>School</th>
-//           </tr>
-//         </thead>
-//         <tbody>
-//           {data.map((item) => (
-//             <tr key={item.id}>
-//               <td>{item.name}</td>
-//               <td>{item.age}</td>
-//               <td>{item.school}</td>
-//             </tr>
-//           ))}
-//         </tbody>
-//       </table>
-//     </div>
-// ));
-
 export default Report;

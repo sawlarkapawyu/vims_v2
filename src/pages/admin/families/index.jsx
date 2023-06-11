@@ -1,12 +1,13 @@
 import Head from 'next/head'
 
 import Sidebar from '@/components/admin/layouts/Sidebar'
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { useUser, useSupabaseClient } from '@supabase/auth-helpers-react'
+import { useReactToPrint } from 'react-to-print';
 
 import { useRouter } from 'next/router';
-import { ChevronLeftIcon, ChevronRightIcon, DocumentPlusIcon, PencilSquareIcon, TrashIcon } from '@heroicons/react/24/outline';
+import { BookOpenIcon, ChevronLeftIcon, ChevronRightIcon, DocumentPlusIcon, PencilSquareIcon, PrinterIcon, TrashIcon } from '@heroicons/react/24/outline';
 import { formatDate, classNames } from '/src/components/utilities/tools.js';
 import { useUserRoleCheck } from '/src/components/utilities/useUserRoleCheck.js';
 
@@ -253,6 +254,53 @@ export default function Family() {
           }
         }
     };
+
+    //Print start
+    const componentRef = useRef();
+    const handlePrint = useReactToPrint({
+        content: () => {
+          const table = componentRef.current;
+          const clonedTable = table.cloneNode(true);
+          const rows = clonedTable.getElementsByTagName('tr');
+      
+          // Create a div element for the row
+          const rowElement = document.createElement('div');
+          rowElement.classList.add('flex', 'justify-between'); // Apply flex and justify-between classes to align the elements
+      
+          // Add page title
+          const titleElement = document.createElement('div');
+          titleElement.innerHTML = `<h1 class="py-4 px-8 font-semibold">${t("sidebar.Families")}</h1>`; // Customize the page title as per your needs
+      
+          // Get current date
+          const currentDate = new Date().toLocaleDateString();
+      
+          // Create a div element for the current date
+          const dateElement = document.createElement('div');
+          dateElement.innerHTML = `<p class="py-4 px-8">${currentDate}</p>`;
+      
+          rowElement.appendChild(titleElement);
+          rowElement.appendChild(dateElement);
+      
+          const tableWrapper = document.createElement('div');
+          tableWrapper.classList.add('text-center'); // Center align the content
+          tableWrapper.appendChild(rowElement);
+          tableWrapper.appendChild(clonedTable);
+      
+          // Remove columns 12 and 13
+          for (let i = 0; i < rows.length; i++) {
+            const row = rows[i];
+            const cells = row.getElementsByTagName('td');
+            if (cells.length >= 19) {
+              row.removeChild(cells[18]);
+              row.removeChild(cells[17]);
+            }
+          }
+      
+          return tableWrapper;
+        },
+    });
+    //Print end
+    
     return (
         <>
             <Head>
@@ -267,13 +315,7 @@ export default function Family() {
                 <div className="px-4 sm:px-6 lg:px-8">
                     {/* Breadcrumbs Start */}
                     <div className='py-2'>
-                        <nav className="sm:hidden" aria-label="Back">
-                            <a href="#" className="flex items-center text-sm font-medium text-gray-500 hover:text-gray-700">
-                                <ChevronLeftIcon className="flex-shrink-0 w-5 h-5 mr-1 -ml-1 text-gray-400" aria-hidden="true" />
-                                {t("other.Back")}
-                            </a>
-                            </nav>
-                            <nav className="hidden sm:flex" aria-label="Breadcrumb">
+                        <nav className="hidden sm:flex" aria-label="Breadcrumb">
                             <ol role="list" className="flex items-center space-x-4">
                                 <li>
                                 <div className="flex">
@@ -312,7 +354,7 @@ export default function Family() {
                             <button
                                 type="button"
                                 onClick={handleAddClick}
-                                className="flex items-center justify-center px-2 py-2 text-sm font-semibold text-white rounded-md shadow-sm bg-sky-600 hover:bg-sky-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-600"
+                                className="flex items-center justify-center px-3 py-2 text-sm font-semibold text-white rounded-md shadow-sm bg-sky-600 hover:bg-sky-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-600"
                             >
                             <DocumentPlusIcon className="w-6 h-6 mr-2"/>
                             {t("other.Add")}
@@ -320,6 +362,9 @@ export default function Family() {
                         </div>
                     </div>
                     <div className="flow-root mt-8">
+                        <p className="text-left text-gray-500 sm:text-left">
+                            {t("filter.TotalResults")}: {filteredFamilies.length}
+                        </p>
                         <div className="py-4 sm:grid sm:grid-cols-6 sm:gap-4">
                             <div className="relative flex items-center mt-2">
                                 <input
@@ -403,7 +448,7 @@ export default function Family() {
                         <div className="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
                             <div className="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
                                 
-                                <table className="min-w-full border-separate border-spacing-0">
+                                <table ref={componentRef} className="min-w-full border-separate border-spacing-0">
                                     <thead className='bg-gray-300'>
                                         <tr>
                                             <th
@@ -725,6 +770,16 @@ export default function Family() {
                                 </nav>
                             </div>
                         </div>
+                    </div>
+                    <div className="flex items-center mt-4">
+                        <button className="flex px-4 py-2 mr-2 text-white bg-blue-900 rounded-md">
+                            <PrinterIcon className="w-5 h-5 mr-2" />
+                            Print
+                        </button>
+                        <button className="flex px-4 py-2 text-white bg-blue-500 rounded-md">
+                            <BookOpenIcon className="w-5 h-5 mr-2" />
+                            Save as PDF
+                        </button>
                     </div>
                 </div>
             </Sidebar>

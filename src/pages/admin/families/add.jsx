@@ -423,18 +423,6 @@ export default function HouseholdAdd() {
         setNrc(nrcName);
         setSearchTermNrc('');
     };
-
-
-    // async function handleSubmit(event) {
-    //     event.preventDefault();
-    //     if (!selectedNrc) return;
-    //     const { data: families, error } = await supabase
-    //       .from('families')
-    //       .insert({ nrc: `${selectedNrc}/${number}` });
-    //     if (error) console.error(error);
-    //     else console.log(families);
-    // }
-
     // Handle create family
     const handleCreateFamily = async (e) => {
         e.preventDefault();        
@@ -473,6 +461,23 @@ export default function HouseholdAdd() {
     const handleBackClick = () => {
         router.push('/admin/families');
     };
+
+    const handleCancel = () => {
+        setName('');
+        setDob('');
+        setNrc('');
+        setGender('');
+        setMotherName('');
+        setFatherName('');
+        setRemark('');
+        setSelectedRelationship('');
+        setSelectedOccupation('');
+        setSelectedEducation('');
+        setSelectedEthnicity('');
+        setSelectedNationality('');
+        setSelectedReligion('');
+        setSelectedHousehold([]);
+    };
     
     return (
         <>
@@ -487,7 +492,7 @@ export default function HouseholdAdd() {
                 <div>
                     <div>
                         <nav className="sm:hidden" aria-label="Back">
-                        <a href="#" className="flex items-center text-sm font-medium text-gray-500 hover:text-gray-700">
+                        <a onClick={handleBackClick} href="#" className="flex items-center text-sm font-medium text-gray-500 hover:text-gray-700">
                             <ChevronLeftIcon className="flex-shrink-0 w-5 h-5 mr-1 -ml-1 text-gray-400" aria-hidden="true" />
                             {t("other.Back")}
                         </a>
@@ -526,20 +531,14 @@ export default function HouseholdAdd() {
                         {t("sidebar.Families")}
                         </h2>
                         </div>
-                        <div className="flex flex-shrink-0 mt-4 md:ml-4 md:mt-0">
-                        {/* <button
-                            type="button"
-                            className="inline-flex items-center px-3 py-2 text-sm font-semibold text-gray-900 bg-white rounded-md shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
-                        >
-                            Edit
-                        </button> */}
-                        <button
-                            type="button"
-                            onClick={handleBackClick}
-                            className="inline-flex items-center px-3 py-2 ml-3 text-sm font-semibold text-white rounded-md shadow-sm bg-sky-600 hover:bg-sky-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-600"
-                        >
-                            <ArrowUturnLeftIcon className="w-5 h-5 mr-2" /> {t("other.Back")}
-                        </button>
+                        <div className="flex-shrink-0 hidden mt-4 md:ml-4 md:mt-0 md:block">
+                            <button
+                                type="button"
+                                onClick={handleBackClick}
+                                className="inline-flex items-center px-3 py-2 ml-3 text-sm font-semibold text-white rounded-md shadow-sm bg-sky-600 hover:bg-sky-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-600"
+                            >
+                                <ArrowUturnLeftIcon className="w-5 h-5 mr-2" /> {t("other.Back")}
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -1144,7 +1143,7 @@ export default function HouseholdAdd() {
                             </div>
                         </div> 
                         <div className="flex items-center justify-end px-4 py-4 border-t gap-x-6 border-gray-900/10 sm:px-8">
-                            <button type="button" className="text-sm font-semibold leading-6 text-gray-900">
+                            <button onClick={handleCancel} type="button" className="text-sm font-semibold leading-6 text-gray-900">
                             {t("other.Cancel")}
                             </button>
                             <button
