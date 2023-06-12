@@ -58,7 +58,7 @@ export default function DisabilityEdit() {
           }
       
           if (disabilityData) {
-            setSelectedDisabilityType([disabilityData.type]);
+            setSelectedDisabilityType(disabilityData.type);
             setDescription(disabilityData.description);
             setDisabilities(disabilityData);
           }
@@ -72,22 +72,27 @@ export default function DisabilityEdit() {
     // Handle edit disabilities
     const handleEditDisability = async (e) => {
         e.preventDefault();
-        const { data: disabilityData, error: disabilityError } = await supabase
-        .from('disabilities')
-        .update({
-            type: selectedDisabilityType,
-            description: description,
-        })
-        .eq('id', id)
-        .single();
+        
+        const confirmed = window.confirm("Are you sure you want to edit?");
+        if (confirmed) {
+            
+            const { data: disabilityData, error: disabilityError } = await supabase
+            .from('disabilities')
+            .update({
+                type: selectedDisabilityType,
+                description: description,
+            })
+            .eq('id', id)
+            .single();
 
-        console.log(disabilityData);
-        if (disabilityError) {
-        alert('Failed to update disability!');
-        console.error(disabilityError);
-        } else {
-        alert('Disability updated successfully!');
-        router.push('/admin/disabilities');
+            console.log(disabilityData);
+            if (disabilityError) {
+            alert('Failed to update disability!');
+            console.error(disabilityError);
+            } else {
+            alert('Disability updated successfully!');
+            router.push('/admin/disabilities');
+            }
         }
     };
 

@@ -313,44 +313,47 @@ export default function FamilySearch() {
     const handleRegister = async (e) => {
         e.preventDefault();
 
-        // Validate required fields
-        if (!deathDate || !deathPlace || !complainant || !selectedFamily) {
-            console.error('Please fill in all required fields.');
-            return;
-        }
-        
-        const { data: deathData, error: deathError } = await supabase
-        .from("deaths")
-        .insert([
-        {
-            death_date: deathDate,
-            death_place: deathPlace,
-            complainant: complainant,
-            remark: remark,
-            family_id: selectedFamily.id
-        },
-        ]);
-        
-        // Update isDeath to 'Yes' in families table
-        const { data: updateData, error: updateError } = await supabase
-        .from("families")
-        .update({ isDeath: 'Yes' })
-        .eq('id', selectedFamily.id);
+        const confirmed = window.confirm('Are you sure you want to save?');
+        if (confirmed) {
+            // Validate required fields
+            if (!deathDate || !deathPlace || !complainant || !selectedFamily) {
+                console.error('Please fill in all required fields.');
+                return;
+            }
+            
+            const { data: deathData, error: deathError } = await supabase
+                .from("deaths")
+                .insert([
+                {
+                    death_date: deathDate,
+                    death_place: deathPlace,
+                    complainant: complainant,
+                    remark: remark,
+                    family_id: selectedFamily.id
+                },
+            ]);
+            
+            // Update isDeath to 'Yes' in families table
+            const { data: updateData, error: updateError } = await supabase
+                .from("families")
+                .update({ isDeath: 'Yes' })
+                .eq('id', selectedFamily.id);
 
-        if (updateError) {
-        throw updateError;
+                if (updateError) {
+                throw updateError;
+                }
+                
+                if (deathError) {
+                    throw deathError;
+                }
+            
+            setSelectedFamily(null)
+            fetchFamilies();
+            alert('Death registered successfully!');
+            router.push('/admin/deaths');
+            console.log(deathData);
+            console.log(updateData);
         }
-        
-        if (deathError) {
-            throw deathError;
-        }
-        
-        setSelectedFamily(null)
-        fetchFamilies();
-        // alert('Death registered successfully!');
-        router.push('/admin/deaths');
-        console.log(deathData);
-        console.log(updateData);
     };
 
     // Pagination Start

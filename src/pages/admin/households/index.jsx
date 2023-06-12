@@ -210,27 +210,27 @@ export default function Household() {
     
     //Delete
     const handleDeleteHousehold = async (householdId) => {
-        const confirmed = window.confirm("Are you sure you want to delete this household?");
         
+        const confirmed = window.confirm("Are you sure you want to delete?");
         if (confirmed) {
-          try {
-            const { error } = await supabase
-              .from('households')
-              .delete()
-              .eq('id', householdId);
-        
-            if (error) {
-              alert('Failed to delete household!');
-              console.error(error);
-            } else {
-              alert('Household deleted successfully!');
-              window.location.reload();
-              router.push('/admin/households');
+            try {
+                const { error } = await supabase
+                .from('households')
+                .delete()
+                .eq('id', householdId);
+            
+                if (error) {
+                alert('Failed to delete household!');
+                console.error(error);
+                } else {
+                alert('Household deleted successfully!');
+                fetchHouseholds();
+                router.push('/admin/households');
+                }
+            } catch (error) {
+                alert('An error occurred while deleting the household!');
+                console.error(error);
             }
-          } catch (error) {
-            alert('An error occurred while deleting the household!');
-            console.error(error);
-          }
         }
     };
 

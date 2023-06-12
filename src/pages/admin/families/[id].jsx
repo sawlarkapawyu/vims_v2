@@ -519,56 +519,59 @@ export default function HouseholdEdit() {
     const handleEditFamily = async (e) => {
         e.preventDefault();
 
-        // Check if all required fields are filled
-        if (
-        !name ||
-        !dob ||
-        !nrc ||
-        !gender ||
-        !fatherName ||
-        !motherName ||
-        !remark ||
-        !selectedRelationship ||
-        !selectedOccupation ||
-        !selectedEducation ||
-        !selectedEthnicity ||
-        !selectedNationality ||
-        !selectedReligion ||
-        !selectedHousehold
-        ) {
-        alert('Please fill all required fields!');
-        return;
-        }
+        const confirmed = window.confirm("Are you sure you want to edit?");
+        if (confirmed) {
+            // Check if all required fields are filled
+            if (
+                !name ||
+                !dob ||
+                !nrc ||
+                !gender ||
+                !fatherName ||
+                !motherName ||
+                !remark ||
+                !selectedRelationship ||
+                !selectedOccupation ||
+                !selectedEducation ||
+                !selectedEthnicity ||
+                !selectedNationality ||
+                !selectedReligion ||
+                !selectedHousehold
+                ) {
+                alert('Please fill all required fields!');
+                return;
+            }
 
-        const { data: familyData, error: familyError } = await supabase
-        .from('families')
-        .update({
-            name: name,
-            date_of_birth: dob,
-            nrc_id: nrc,
-            gender: gender,
-            father_name: fatherName,
-            mother_name: motherName,
-            remark: remark,
-            resident: resident,
-            relationship_id: selectedRelationship,
-            occupation_id: selectedOccupation,
-            education_id: selectedEducation,
-            ethnicity_id: selectedEthnicity,
-            nationality_id: selectedNationality,
-            religion_id: selectedReligion,
-            household_no: selectedHousehold
-        })
-        .eq('id', id)
-        .single();
+            const { data: familyData, error: familyError } = await supabase
+                .from('families')
+                .update({
+                    name: name,
+                    date_of_birth: dob,
+                    nrc_id: nrc,
+                    gender: gender,
+                    father_name: fatherName,
+                    mother_name: motherName,
+                    remark: remark,
+                    resident: resident,
+                    relationship_id: selectedRelationship,
+                    occupation_id: selectedOccupation,
+                    education_id: selectedEducation,
+                    ethnicity_id: selectedEthnicity,
+                    nationality_id: selectedNationality,
+                    religion_id: selectedReligion,
+                    household_no: selectedHousehold
+                })
+                .eq('id', id)
+                .single();
 
-        console.log(familyData);
-        if (familyError) {
-        alert('Failed to update family!');
-        console.error(familyError);
-        } else {
-        alert('Family updated successfully!');
-        router.push('/admin/families');
+                console.log(familyData);    
+            if (familyError) {
+            alert('Failed to update family!');
+            console.error(familyError);
+            } else {
+            alert('Family updated successfully!');
+            router.push('/admin/families');
+            }
         }
     };
 

@@ -92,27 +92,28 @@ export default function Disability() {
 
     //Delete
     const handleDeleteDisability = async (disabilityId) => {        
+        
         const confirmed = window.confirm('Are you sure you want to delete?');
-      
         if (confirmed) {
-          try {
-            const { error: deleteError } = await supabase
-              .from('disabilities')
-              .delete()
-              .eq('id', disabilityId);
-      
-            if (deleteError) {
-              alert('Failed to delete!');
-              console.error(deleteError);
-            } else {
-              alert('Deleted successfully!');
-              window.location.reload();
-              router.push('/admin/disabilities');
+            try {
+                const { error: deleteError } = await supabase
+                .from('disabilities')
+                .delete()
+                .eq('id', disabilityId);
+        
+                if (deleteError) {
+                alert('Failed to delete!');
+                console.error(deleteError);
+                } else {
+                alert('Deleted successfully!');
+                
+                fetchDisabilities();
+                router.push('/admin/disabilities');
+                }
+            } catch (error) {
+                alert('An error occurred while deleting!');
+                console.error(error);
             }
-          } catch (error) {
-            alert('An error occurred while deleting!');
-            console.error(error);
-          }
         }
     };
       

@@ -231,27 +231,28 @@ export default function Family() {
 
     //Delete
     const handleDeleteFamily = async (familyId) => {
-        const confirmed = window.confirm("Are you sure you want to delete this household?");
-        
+
+        const confirmed = window.confirm("Are you sure you want to delete?");
         if (confirmed) {
-          try {
-            const { error } = await supabase
-              .from('families')
-              .delete()
-              .eq('id', familyId);
-        
-            if (error) {
-              alert('Failed to delete family!');
-              console.error(error);
-            } else {
-              alert('Family deleted successfully!');
-              window.location.reload();
-              router.push('/admin/families');
+
+            try {
+                const { error } = await supabase
+                .from('families')
+                .delete()
+                .eq('id', familyId);
+            
+                if (error) {
+                alert('Failed to delete family!');
+                console.error(error);
+                } else {
+                alert('Family deleted successfully!');
+                fetchFamilies();
+                router.push('/admin/families');
+                }
+            } catch (error) {
+                alert('An error occurred while deleting the family!');
+                console.error(error);
             }
-          } catch (error) {
-            alert('An error occurred while deleting the family!');
-            console.error(error);
-          }
         }
     };
 

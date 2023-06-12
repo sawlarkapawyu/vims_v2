@@ -204,52 +204,55 @@ export default function HouseholdAdd() {
     // Handle create household
     const handleCreateHousehold = async (e) => {
         e.preventDefault();
+        
+        const confirmed = window.confirm("Are you sure you want to save?");
+        if (confirmed) {
+            // Check if all required fields are filled
+            if (
+            !entryDate ||
+            !householdId ||
+            !houseNo ||
+            !selectedStateRegion ||
+            !selectedDistrict ||
+            !selectedTownship ||
+            !selectedWardVillageTract ||
+            !selectedVillage
+            ) {
+            alert('Please fill all required fields!');
+            return;
+            }
 
-        // Check if all required fields are filled
-        if (
-        !entryDate ||
-        !householdId ||
-        !houseNo ||
-        !selectedStateRegion ||
-        !selectedDistrict ||
-        !selectedTownship ||
-        !selectedWardVillageTract ||
-        !selectedVillage
-        ) {
-        alert('Please fill all required fields!');
-        return;
-        }
+            try {
+            const { data: householdData, error: householdError } = await supabase
+                .from('households')
+                .insert([
+                {
+                    entry_date: entryDate,
+                    household_no: householdId,
+                    house_no: houseNo,
+                    state_region_id: selectedStateRegion.id,
+                    district_id: selectedDistrict.id,
+                    township_id: selectedTownship.id,
+                    ward_village_tract_id: selectedWardVillageTract.id,
+                    village_id: selectedVillage,
+                },
+                ]);
 
-        try {
-        const { data: householdData, error: householdError } = await supabase
-            .from('households')
-            .insert([
-            {
-                entry_date: entryDate,
-                household_no: householdId,
-                house_no: houseNo,
-                state_region_id: selectedStateRegion.id,
-                district_id: selectedDistrict.id,
-                township_id: selectedTownship.id,
-                ward_village_tract_id: selectedWardVillageTract.id,
-                village_id: selectedVillage,
-            },
-            ]);
+            if (householdError) {
+                throw householdError;
+            }
 
-        if (householdError) {
-            throw householdError;
-        }
+            // Show success alert
+            alert('Household created successfully!');
 
-        // Show success alert
-        alert('Household created successfully!');
-
-        // Redirect to '/admin/households'
-        router.push('/admin/households');
-        console.log(householdData);
-        } catch (error) {
-        console.error(error);
-        // Show error alert
-        alert('An error occurred while creating the household.');
+            // Redirect to '/admin/households'
+            router.push('/admin/households');
+            console.log(householdData);
+            } catch (error) {
+            console.error(error);
+            // Show error alert
+            alert('An error occurred while creating the household.');
+            }
         }
     };
 

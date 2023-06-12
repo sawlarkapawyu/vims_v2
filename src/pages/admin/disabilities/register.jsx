@@ -61,6 +61,8 @@ export default function DisibilitySearch() {
                     father_name,
                     mother_name,
                     remark,
+                    isDeath,
+                    isDisability,
                     relationships (name),
                     occupations (name),
                     educations (name),
@@ -70,7 +72,8 @@ export default function DisibilitySearch() {
                     households (household_no, state_regions(name), townships(name), districts(name), ward_village_tracts(name), villages(name)),
                     household_no
                 `)
-                .eq('isDeath', 'No');
+                .eq('isDeath', 'No')
+                .eq('isDisability', 'No');
         
             if (familiesError) throw new Error(familiesError.message);
       
@@ -310,36 +313,40 @@ export default function DisibilitySearch() {
     const handleRegister = async (e) => {
         e.preventDefault();
 
-        const { data: disabilityData, error: disabilityError } = await supabase
-        .from("disabilities")
-        .insert([
-        {
-            type: selectedDisability,
-            description: description,
-            family_id: selectedFamily.id
-        },
-        ]);
-        
-        // Update isDeath to 'Yes' in families table
-        const { data: updateData, error: updateError } = await supabase
-        .from("families")
-        .update({ isDisability: 'Yes' })
-        .eq('id', selectedFamily.id);
+        const confirmed = window.confirm("Are you sure you want to save?");
+        if (confirmed) {
+            const { data: disabilityData, error: disabilityError } = await supabase
+                .from("disabilities")
+                .insert([
+                {
+                    type: selectedDisability,
+                    description: description,
+                    family_id: selectedFamily.id
+                },
+            ]);
+            
+            // Update isDeath to 'Yes' in families table
+            const { data: updateData, error: updateError } = await supabase
+                .from("families")
+                .update({ isDisability: 'Yes' })
+                .eq('id', selectedFamily.id);
 
-        if (updateError) {
-        throw updateError;
+                if (updateError) {
+                throw updateError;
+                }
+                
+                if (disabilityError) {
+                    throw disabilityError;
+                }
+            
+            setSelectedFamily(null)
+            fetchFamilies();
+            router.push('/admin/disabilities');
+            console.log(disabilityData);
+            console.log(updateData);
         }
-        
-        if (disabilityError) {
-            throw disabilityError;
-        }
-        
-        setSelectedFamily(null)
-        fetchFamilies();
-        router.push('/admin/disabilities');
-        console.log(disabilityData);
-        console.log(updateData);
     };
+
 
     // Pagination Start
     const [currentPage, setCurrentPage] = useState(0);

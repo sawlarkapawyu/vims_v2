@@ -90,43 +90,46 @@ export default function HouseholdEdit() {
     const handleEditHousehold = async (e) => {
         e.preventDefault();
 
-        // Check if all required fields are filled
-        if (
-        !entryDate ||
-        !householdId ||
-        !houseNo ||
-        !selectedStateRegion ||
-        !selectedDistrict ||
-        !selectedTownship ||
-        !selectedWardVillageTract ||
-        !selectedVillage
-        ) {
-        alert('Please fill all required fields!');
-        return;
-        }
+        const confirmed = window.confirm("Are you sure you want to edit?");
+        if (confirmed) {
+            // Check if all required fields are filled
+            if (
+            !entryDate ||
+            !householdId ||
+            !houseNo ||
+            !selectedStateRegion ||
+            !selectedDistrict ||
+            !selectedTownship ||
+            !selectedWardVillageTract ||
+            !selectedVillage
+            ) {
+            alert('Please fill all required fields!');
+            return;
+            }
 
-        const { data: householdData, error: householdError } = await supabase
-        .from('households')
-        .update({
-            entry_date: entryDate,
-            household_no: householdId,
-            house_no: houseNo,
-            state_region_id: selectedStateRegion.id,
-            district_id: selectedDistrict.id,
-            township_id: selectedTownship.id,
-            ward_village_tract_id: selectedWardVillageTract.id,
-            village_id: selectedVillage
-        })
-        .eq('id', id)
-        .single();
+            const { data: householdData, error: householdError } = await supabase
+            .from('households')
+            .update({
+                entry_date: entryDate,
+                household_no: householdId,
+                house_no: houseNo,
+                state_region_id: selectedStateRegion.id,
+                district_id: selectedDistrict.id,
+                township_id: selectedTownship.id,
+                ward_village_tract_id: selectedWardVillageTract.id,
+                village_id: selectedVillage.id
+            })
+            .eq('id', id)
+            .single();
 
-        console.log(householdData);
-        if (householdError) {
-        alert('Failed to update household!');
-        console.error(householdError);
-        } else {
-        alert('Household updated successfully!');
-        router.push('/admin/households');
+            console.log(householdData);
+            if (householdError) {
+            alert('Failed to update household!');
+            console.error(householdError);
+            } else {
+            alert('Household updated successfully!');
+            router.push('/admin/households');
+            }
         }
     };
 

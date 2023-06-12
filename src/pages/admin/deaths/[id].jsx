@@ -70,24 +70,29 @@ export default function DeathEdit() {
     // Handle edit death
     const handleEditDeath = async (e) => {
         e.preventDefault();
-        const { data: deathData, error: deathError } = await supabase
-        .from('deaths')
-        .update({
-            death_date: deathDate,
-            death_place: deathPlace,
-            complainant: complainant,
-            remark: remark
-        })
-        .eq('id', id)
-        .single();
 
-        console.log(deathData);
-        if (deathError) {
-        alert('Failed to update death!');
-        console.error(deathError);
-        } else {
-        alert('Death updated successfully!');
-        router.push('/admin/deaths');
+        const confirmed = window.confirm('Are you sure you want to edit?');
+        if (confirmed) {
+
+            const { data: deathData, error: deathError } = await supabase
+                .from('deaths')
+                .update({
+                    death_date: deathDate,
+                    death_place: deathPlace,
+                    complainant: complainant,
+                    remark: remark
+                })
+                .eq('id', id)
+                .single();
+
+                console.log(deathData);
+                if (deathError) {
+                alert('Failed to update death!');
+                console.error(deathError);
+                } else {
+                alert('Death updated successfully!');
+                router.push('/admin/deaths');
+            }
         }
     };
 

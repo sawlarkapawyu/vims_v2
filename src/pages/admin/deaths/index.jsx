@@ -99,33 +99,32 @@ export default function Deaths() {
         const selectedFamily = deaths.find((family) => family.id === familyId);
         
         const confirmed = window.confirm('Are you sure you want to delete?');
-      
         if (confirmed) {
-          try {
-            const { error: deleteError } = await supabase
-              .from('deaths')
-              .delete()
-              .eq('id', selectedFamily.id);
-      
-            if (deleteError) {
-              alert('Failed to delete!');
-              console.error(deleteError);
-            } else {
-              const { error: updateError } = await supabase
-                .from('families')
-                .update({ isDeath: 'No' })
-                .eq('id', selectedFamily.family_id); // Update based on the actual column name of the family ID
-      
-              if (updateError) {
-                alert('Failed to update the isDeath field in the families table!');
-                console.error(updateError);
-              } else {
-                alert('Deleted successfully!');
-                window.location.reload();
-                router.push('/admin/deaths');
-              }
-            }
-          } catch (error) {
+            try {
+                const { error: deleteError } = await supabase
+                .from('deaths')
+                .delete()
+                .eq('id', selectedFamily.id);
+        
+                if (deleteError) {
+                alert('Failed to delete!');
+                console.error(deleteError);
+                } else {
+                const { error: updateError } = await supabase
+                    .from('families')
+                    .update({ isDeath: 'No' })
+                    .eq('id', selectedFamily.family_id); // Update based on the actual column name of the family ID
+        
+                if (updateError) {
+                    alert('Failed to update the isDeath field in the families table!');
+                    console.error(updateError);
+                } else {
+                    fetchDeaths();
+                    alert('Deleted successfully!');
+                    router.push('/admin/deaths');
+                }
+                }
+            } catch (error) {
             alert('An error occurred while deleting!');
             console.error(error);
           }

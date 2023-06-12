@@ -425,36 +425,40 @@ export default function HouseholdAdd() {
     };
     // Handle create family
     const handleCreateFamily = async (e) => {
-        e.preventDefault();        
-        const { data: familyData, error: familyError } = await supabase
-        .from("families")
-        .insert([
-        {
-            name: name,
-            date_of_birth: dob,
-            nrc_id: nrc,
-            gender: gender,
-            father_name: fatherName,
-            mother_name: motherName,
-            resident: 'ရှိ',
-            isDeath: 'No',
-            isDisability: 'No',
-            remark: remark,
-            relationship_id: selectedRelationship,
-            occupation_id: selectedOccupation,
-            education_id: selectedEducation,
-            ethnicity_id: selectedEthnicity,
-            nationality_id: selectedNationality,
-            religion_id: selectedReligion,
-            household_no: selectedHousehold
-        },
-        ]);
+        e.preventDefault();    
+        
+        const confirmed = window.confirm("Are you sure you want to save?");
+        if (confirmed) {
+            const { data: familyData, error: familyError } = await supabase
+                .from("families")
+                .insert([
+                {
+                    name: name,
+                    date_of_birth: dob,
+                    nrc_id: nrc,
+                    gender: gender,
+                    father_name: fatherName,
+                    mother_name: motherName,
+                    resident: 'ရှိ',
+                    isDeath: 'No',
+                    isDisability: 'No',
+                    remark: remark,
+                    relationship_id: selectedRelationship,
+                    occupation_id: selectedOccupation,
+                    education_id: selectedEducation,
+                    ethnicity_id: selectedEthnicity,
+                    nationality_id: selectedNationality,
+                    religion_id: selectedReligion,
+                    household_no: selectedHousehold
+                },
+            ]);
 
-    if (familyError) {
-        throw familyError;
-    }
-    router.push('/admin/families');
-    console.log(familyData);
+            if (familyError) {
+                throw familyError;
+            }
+            router.push('/admin/families');
+            console.log(familyData);
+        }
     };
 
 
