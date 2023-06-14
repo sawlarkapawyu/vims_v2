@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { useSupabaseClient } from '@supabase/auth-helpers-react'
 import { useTranslation } from "next-i18next";
-import Image from 'next/image';
 
 export default function Avatar({ uid, url, size, onUpload }) {
   const supabase = useSupabaseClient()
@@ -59,30 +58,30 @@ export default function Avatar({ uid, url, size, onUpload }) {
   return (
     <div>
       {avatarUrl ? (
-        <Image
-        src={avatarUrl}
-        alt="Avatar"
-        className="avatar image"
-        width={200}
-        height={200}
-      />      
+        <img
+          src={avatarUrl}
+          alt="Avatar"
+          className="avatar image"
+          style={{ height: size, width: size }}
+        />
       ) : (
-        <div className="avatar no-image" />
+        <div className="avatar no-image" style={{ height: size, width: size }} />
       )}
       <div style={{ width: size }}>
         <label className="block button primary" htmlFor="single">
           {uploading ? 'Uploading ...' : t('profile.Upload')}
         </label>
         <input
+          style={{
+            visibility: 'hidden',
+            position: 'absolute',
+            width: '0'
+          }}
           type="file"
           id="single"
           accept="image/*"
           onChange={uploadAvatar}
           disabled={uploading}
-          style={{
-            visibility: 'hidden',
-            position: 'absolute',
-          }}
         />
       </div>
     </div>

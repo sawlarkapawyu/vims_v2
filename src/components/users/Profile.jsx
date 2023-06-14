@@ -13,7 +13,6 @@ export default function UserProfile( { session } ) {
     const [full_name, setFullname] = useState(null)
     const [website, setWebsite] = useState(null)
     const [avatar_url, setAvatarUrl] = useState(null)
-    
     const { t } = useTranslation("");
     useEffect(() => {
         getProfile()
@@ -156,19 +155,16 @@ export default function UserProfile( { session } ) {
                                 </div>
                             </div>
                             <div className="text-center">
-                                <h2 className="py-4 text-3xl font-bold tracking-tight text-gray-900">{t("profile.UserImage")}</h2>
+                                <h2 className="py-4 font-bold tracking-tight text-gray-900 text-md">{t("profile.UserImage")}</h2>
                                 <div className="inline-block p-2 border border-gray-300">
-                                    <div className="sm:w-auto sm:mx-auto">
                                     <Avatar
                                         uid={user.id}
                                         url={avatar_url}
-                                        
                                         onUpload={(url) => {
                                         setAvatarUrl(url)
                                         updateProfile({ username, website, avatar_url: url })
                                         }}
                                     />
-                                    </div>
                                 </div>
                             </div>
 
