@@ -90,7 +90,6 @@ export default function UserProfile( { session } ) {
                                                 value={session.user.email} 
                                                 disabled
                                                 autoComplete="email"
-                                                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm"
                                             />
                                             </dd>
                                         </div>
@@ -109,7 +108,6 @@ export default function UserProfile( { session } ) {
                                                 value={full_name || ''}
                                                 onChange={(e) => setFullname(e.target.value)}
                                                 autoComplete="full_name"
-                                                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm"
                                             />
                                             </dd>
                                         </div>
@@ -128,7 +126,6 @@ export default function UserProfile( { session } ) {
                                                 value={username || ''}
                                                 onChange={(e) => setUsername(e.target.value)}
                                                 autoComplete="given-name"
-                                                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm"
                                             />
                                             </dd>
                                         </div>
@@ -146,7 +143,6 @@ export default function UserProfile( { session } ) {
                                                 id="website"
                                                 value={website || ''}
                                                 onChange={(e) => setWebsite(e.target.value)}
-                                                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm"
                                                 placeholder="www.example.com"
                                                 />
                                             </dd>
@@ -171,7 +167,7 @@ export default function UserProfile( { session } ) {
                         </div>
                     </div>
                 </div>
-                {/* <div className="flex items-center justify-end px-4 py-4 border-t gap-x-6 border-gray-900/10 sm:px-8">
+                <div className="flex items-center justify-end px-4 py-4 border-t gap-x-6 border-gray-900/10 sm:px-8">
                     <button type="button" 
                         onClick={() => supabase.auth.signOut()}
                         className="text-sm font-semibold leading-6 text-gray-900">
@@ -185,7 +181,7 @@ export default function UserProfile( { session } ) {
                     {loading ? 'Loading ...' : t('profile.Update')}
                     
                     </button>
-                </div> */}
+                </div>
            
         </div>
         
