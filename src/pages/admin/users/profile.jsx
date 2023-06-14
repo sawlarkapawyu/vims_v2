@@ -16,25 +16,23 @@ export default function Dashboard() {
     const session = useSession()
     const supabase = useSupabaseClient()
     
-    // useEffect(() => {
-    //     if (!session) {
-    //       router.push('/login');
-    //     }
-    // }, [session, router]);
+    useEffect(() => {
+        if (!session) {
+          router.push('/login');
+        }
+    }, [session, router]);
     
     const { t } = useTranslation("");
-    
     
     return (
         <>
             <Head>
-                <title>VIMS - Profile</title>
+                <title>VIMS - Dashboard</title>
                 <meta
                 name="description"
                 content="Most bookkeeping software is accurate, but hard to use. We make the opposite trade-off, and hope you don’t get audited."
                 />
             </Head>
-            {/* <AuthForm /> */}
             <Sidebar>
                 <div className="md:flex md:items-center md:justify-between">
                     <div className="flex-1 min-w-0">
@@ -42,10 +40,14 @@ export default function Dashboard() {
                         {t('profile.Title')}
                         </h2>
                     </div>
+                    <div className="flex mt-4 md:ml-4 md:mt-0">
+                        
+                    </div>
                 </div>
-                {/* {session ? <Profile session={session} /> : null} */}
-                <Profile />
+                {session ? <Profile session={session} /> : null}
+                
             </Sidebar>
+        
         </>
     )
 }
