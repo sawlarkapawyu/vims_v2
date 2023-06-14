@@ -13,56 +13,6 @@ export default function UserProfile( { session } ) {
     const [full_name, setFullname] = useState(null)
     const [website, setWebsite] = useState(null)
     const [avatar_url, setAvatarUrl] = useState(null)
-    
-    const [uploading, setUploading] = useState(false)
-    
-    useEffect(() => {
-        if (url) downloadImage(url)
-    }, [url])
-
-    async function downloadImage(path) {
-        try {
-          const { data, error } = await supabase.storage.from('avatars').download(path)
-          if (error) {
-            throw error
-          }
-          const url = URL.createObjectURL(data)
-          setAvatarUrl(url)
-        } catch (error) {
-          console.log('Error downloading image: ', error)
-        }
-    }
-    
-      const uploadAvatar = async (event) => {
-        try {
-          setUploading(true)
-    
-          if (!event.target.files || event.target.files.length === 0) {
-            throw new Error('You must select an image to upload.')
-          }
-    
-          const file = event.target.files[0]
-          const fileExt = file.name.split('.').pop()
-          const fileName = `${uid}.${fileExt}`
-          const filePath = `${fileName}`
-    
-          let { error: uploadError } = await supabase.storage
-            .from('avatars')
-            .upload(filePath, file, { upsert: true })
-    
-          if (uploadError) {
-            throw uploadError
-          }
-    
-          onUpload(filePath)
-        } catch (error) {
-          alert('Error uploading avatar!')
-          console.log(error)
-        } finally {
-          setUploading(false)
-        }
-    }
-      
     const { t } = useTranslation("");
     useEffect(() => {
         getProfile()
@@ -211,6 +161,7 @@ export default function UserProfile( { session } ) {
                                     <Avatar
                                         uid={user.id}
                                         url={avatar_url}
+                                        size={150}
                                         onUpload={(url) => {
                                         setAvatarUrl(url)
                                         updateProfile({ username, website, avatar_url: url })
