@@ -56,7 +56,7 @@ export default function Avatar({ uid, url, size, onUpload }) {
   }
 
   return (
-    <div>
+    <div className="sm:w-auto sm:mx-auto">
       {avatarUrl ? (
         <img
           src={avatarUrl}
