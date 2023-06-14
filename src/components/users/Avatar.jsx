@@ -56,7 +56,7 @@ export default function Avatar({ uid, url, size, onUpload }) {
   }
 
   return (
-    <div className="sm:w-auto sm:mx-auto">
+    <>
       {avatarUrl ? (
         <img
           src={avatarUrl}
@@ -83,6 +83,6 @@ export default function Avatar({ uid, url, size, onUpload }) {
           disabled={uploading}
         />
       </div>
-    </div>
+    </>
   )
 }
