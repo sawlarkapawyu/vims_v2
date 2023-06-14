@@ -16,11 +16,12 @@ export default function Dashboard() {
     const session = useSession()
     const supabase = useSupabaseClient()
     
-    useEffect(() => {
-        if (!session) {
-          router.push('/login');
-        }
-    }, [session, router]);
+    // useEffect(() => {
+    //     if (!session) {
+    //       router.push('/login');
+    //     }
+    // }, [session, router]);
+    
     const { t } = useTranslation("");
     
     
@@ -42,7 +43,8 @@ export default function Dashboard() {
                         </h2>
                     </div>
                 </div>
-                {session ? <Profile session={session} /> : null}
+                {/* {session ? <Profile session={session} /> : null} */}
+                <Profile />
             </Sidebar>
         </>
     )
