@@ -154,20 +154,23 @@ export default function UserProfile( { session } ) {
                                     </dl>
                                 </div>
                             </div>
-                            {/* <div className="text-center">
+                            <div className="text-center">
                                 <h2 className="py-4 text-3xl font-bold tracking-tight text-gray-900">{t("profile.UserImage")}</h2>
                                 <div className="inline-block p-2 border border-gray-300">
+                                    <div className="sm:w-auto sm:mx-auto">
                                     <Avatar
-                                    uid={user.id}
-                                    url={avatar_url}
-                                    size={150}
-                                    onUpload={(url) => {
+                                        uid={user.id}
+                                        url={avatar_url}
+                                        size={150}
+                                        onUpload={(url) => {
                                         setAvatarUrl(url)
                                         updateProfile({ username, website, avatar_url: url })
-                                    }}
+                                        }}
                                     />
+                                    </div>
                                 </div>
-                            </div> */}
+                            </div>
+
                         </div>
                     </div>
                 </div>
