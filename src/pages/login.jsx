@@ -59,7 +59,7 @@ export default function Login() {
         <Auth
         redirectTo={router.asPath}
         supabaseClient={supabaseClient}
-        providers={['google', 'facebook', 'github']}
+        providers={['google', 'github']}
         socialLayout="horizontal"
         appearance={{ theme: ThemeSupa, 
             variables: {
