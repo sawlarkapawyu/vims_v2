@@ -171,7 +171,7 @@ export default function UserProfile( { session } ) {
                         </div>
                     </div>
                 </div>
-                <div className="flex items-center justify-end px-4 py-4 border-t gap-x-6 border-gray-900/10 sm:px-8">
+                {/* <div className="flex items-center justify-end px-4 py-4 border-t gap-x-6 border-gray-900/10 sm:px-8">
                     <button type="button" 
                         onClick={() => supabase.auth.signOut()}
                         className="text-sm font-semibold leading-6 text-gray-900">
@@ -185,7 +185,7 @@ export default function UserProfile( { session } ) {
                     {loading ? 'Loading ...' : t('profile.Update')}
                     
                     </button>
-                </div>
+                </div> */}
            
         </div>
         
