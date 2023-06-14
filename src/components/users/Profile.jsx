@@ -72,7 +72,7 @@ export default function UserProfile( { session } ) {
 
     return (
         <div className="flow-root mt-8">
-            <div className="py-24 bg-white sm:py-32">
+            
                 <div className="px-4 py-4 mx-auto max-w-7xl lg:px-8">
                     <div className="max-w-2xl mx-auto space-y-16 divide-y divide-gray-100 lg:mx-0 lg:max-w-none">
                         <div className="grid grid-cols-1 gap-x-8 gap-y-10 lg:grid-cols-3">
@@ -186,7 +186,7 @@ export default function UserProfile( { session } ) {
                     
                     </button>
                 </div>
-            </div>
+           
         </div>
         
 
