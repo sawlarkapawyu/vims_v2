@@ -1,24 +1,14 @@
 import Head from 'next/head'
-import { useState, useEffect } from 'react';
 import Sidebar from '@/components/admin/layouts/Sidebar'
 import Dashboards from '@/components/admin/Dashboard';
 import { useRouter } from 'next/router';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { useTranslation } from "next-i18next";
 import { useUserRoleCheckIsVillager } from '/src/components/utilities/useUserRoleCheckIsVillager.js';
-import { useSession } from '@supabase/auth-helpers-react'
 
 export default function Dashboard() {
     const router = useRouter();
-    const session = useSession()
-
-    useEffect(() => {
-        if (!session) {
-          router.push('/login');
-        }
-    }, [session, router]);
-
-    // useUserRoleCheckIsVillager();
+    useUserRoleCheckIsVillager();
     
     const { t } = useTranslation("");
     const handleClick = () => {

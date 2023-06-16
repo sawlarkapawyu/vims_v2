@@ -7,7 +7,6 @@ import { BookOpenIcon, FolderPlusIcon, PencilSquareIcon, PrinterIcon, TrashIcon 
 import { useUser, useSupabaseClient } from '@supabase/auth-helpers-react'
 import { useUserRoleCheck } from '/src/components/utilities/useUserRoleCheck.js';
 import { useReactToPrint } from 'react-to-print';
-import { CSVLink } from "react-csv";
 
 
 import { useRouter } from 'next/router';
@@ -24,7 +23,6 @@ export default function Disability() {
     
     const [isLoading, setIsLoading] = useState(false);
     const [disabilities, setDisabilities] = useState([]);
-    const [csvData, setCSVData] = useState([]);
 
     useUserRoleCheck();
 
@@ -35,45 +33,25 @@ export default function Disability() {
 
     const fetchDisabilities = async () => {
         setIsLoading(true);
-      
-        const { data: disabilityData, error: disabilityError } = await supabase
+        
+        const { data: disibilityData, error: disibilityError } = await supabase
           .from("disabilities")
           .select(`
             id,
+            type_of_disabilities (name),
             description,
             family_id,
-            type,
-            type_of_disabilities (name),
-            families (
-              name,
-              date_of_birth,
-              nrc_id,
-              gender,
-              households (
-                household_no,
-                state_regions(name),
-                townships(name),
-                districts(name),
-                ward_village_tracts(name),
-                villages(name)
-              )
-            )
+            families (name, date_of_birth, nrc_id, gender, households (household_no, state_regions(name), townships(name), districts(name), ward_village_tracts(name), villages(name)))
           `)
           .order("id", { ascending: false });
-      
-        if (disabilityError) {
-          throw disabilityError;
+        
+        if (disibilityError) {
+          throw disibilityError;
         }
-      
-        setDisabilities(disabilityData);
-        setCSVData(disabilityData); // Set the CSV data
+        setDisabilities(disibilityData);
         setIsLoading(false);
-      
-        return disabilityData;
+        return disibilityData;
     };
-      
-      
-      
     
     const handleRegisterClick = () => {
         router.push('/admin/disabilities/register');
@@ -517,14 +495,9 @@ export default function Disability() {
                             Print
                         </button>
                         <button className="flex px-4 py-2 text-white bg-blue-500 rounded-md">
+                            <BookOpenIcon className="w-5 h-5 mr-2" />
                             
-                                <CSVLink
-                                    data={csvData}
-                                    filename={"disabilities.csv"}
-                                >
-                                   <BookOpenIcon className="w-5 h-5 mr-2" />
-                                    Export CSV
-                                </CSVLink>
+                                Export CSV
                                
                         </button>
                     </div>
