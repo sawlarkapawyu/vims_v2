@@ -2,10 +2,10 @@ import { GridFilterListIcon } from '@mui/x-data-grid';
 import React, { useState, useEffect } from "react";
 import { useSupabaseClient } from '@supabase/auth-helpers-react'
 // import { supabase } from "/src/components/utilities/supabase";
-import { UserGroupIcon, HomeModernIcon, DocumentDuplicateIcon, StarIcon } from '@heroicons/react/24/outline';
+import { UserGroupIcon, HomeModernIcon, DocumentDuplicateIcon, StarIcon, BookOpenIcon, ArrowDownIcon, DocumentArrowDownIcon } from '@heroicons/react/24/outline';
 import DropdownSelect from 'react-dropdown-select';
 import { useTranslation } from "next-i18next";
-
+import { CSVLink } from "react-csv";
 
 import { Bar, Pie } from 'react-chartjs-2';
 import { Chart, LinearScale, CategoryScale, BarController, BarElement, ArcElement, Tooltip, Legend, Title } from 'chart.js';
@@ -39,8 +39,6 @@ const Dashboard = () => {
 
     const [occupations, setOccupations] = useState([]);
     const [selectedOccupation, setSelectedOccupation] = useState('');
-    const [educations, setEducations] = useState([]);
-    const [selectedEducation, setSelectedEducation] = useState('');
     const [ethnicities, setEthnicities] = useState([]);
     const [selectedEthnicity, setSelectedEthnicity] = useState('');
     const [religions, setReligions] = useState([]);
@@ -55,6 +53,7 @@ const Dashboard = () => {
     const [selectedDisability, setSelectedDisability] = useState('');
     const [genders, setGenders] = useState([]);
     const [selectedGender, setSelectedGender] = useState('');
+    const [csvData, setCSVData] = useState([]);
 
     //Count user
     const [users, setUsers] = useState([]);
@@ -65,7 +64,6 @@ const Dashboard = () => {
           try {
             fetchFamilies();
             fetchOccupation();
-            fetchEducation();
             fetchEthnicity();
             fetchReligion();
             fetchDeaths();
@@ -106,7 +104,6 @@ const Dashboard = () => {
           disabilities (id),
           relationships (id, name),
           occupations (id, name),
-          educations (id, name),
           ethnicities (id, name),
           nationalities (id, name),
           religions (id, name),
@@ -281,18 +278,6 @@ const Dashboard = () => {
           setOccupations(data);
         } catch (error) {
           console.log('Error fetching occupations:', error.message);
-        }
-    }
-
-    async function fetchEducation() {
-        try {
-          const { data, error } = await supabase.from('educations').select('id, name');
-          if (error) {
-            throw new Error(error.message);
-          }
-          setEducations(data);
-        } catch (error) {
-          console.log('Error fetching educations:', error.message);
         }
     }
 
@@ -489,7 +474,6 @@ const Dashboard = () => {
         family.nrc_id.toLowerCase().includes(searchQuery.toLowerCase()) ||
 
         family.occupations.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        family.educations.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         family.ethnicities.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         family.households.household_no.toLowerCase().includes(searchQuery.toLowerCase()) ||
         family.religions.name.toLowerCase().includes(searchQuery.toLowerCase());
@@ -499,9 +483,6 @@ const Dashboard = () => {
 
         const isMatchingOccupation =
         selectedOccupation === '' || family.occupations.name === selectedOccupation;
-
-        const isMatchingEducation =
-        selectedEducation === '' || family.educations.name === selectedEducation;
 
         const isMatchingEthnicity =
         selectedEthnicity === '' ||
@@ -536,7 +517,6 @@ const Dashboard = () => {
         return (
             isMatchingDeath &&
             isMatchingOccupation &&
-            isMatchingEducation &&
             isMatchingEthnicity &&
             isMatchingReligion &&
             isMatchingAge &&
@@ -552,6 +532,43 @@ const Dashboard = () => {
             isMatchingVillage
         );
     });
+
+    // CSV Export Start
+    useEffect(() => {
+        const formattedData = filterFamilies.map((family) => {
+            const occupationName = family.occupations?.name;
+            const ethnicityName = family.ethnicities?.name;
+            const religionName = family.religions?.name;
+            const villageName = family.households?.villages?.name;
+            const wardVillageTractName = family.households?.ward_village_tracts?.name;
+            const townshipName = family.households?.townships?.name;
+            const districtName = family.households?.districts?.name;
+            const stateRegionName = family.households?.state_regions?.name;
+            const age = checkAge(family.date_of_birth)
+            ? Math.floor((new Date() - new Date(family.date_of_birth)) / (365.25 * 24 * 60 * 60 * 1000))
+            : '';
+            
+            return {
+            id: family.id.toString(),
+            age: age,            
+            gender: family.gender,
+            resident: family.resident,
+            is_death: family.isDeath,
+            is_disability: family.isDisability,
+            occupation_name: occupationName || '',
+            ethnicity_name: ethnicityName || '',
+            religion_name: religionName || '',
+            village: villageName || '',
+            ward_village_tract: wardVillageTractName || '',
+            township: townshipName || '',
+            district: districtName || '',
+            state_region: stateRegionName || '',
+            };
+        });
+        
+        setCSVData(formattedData);
+    }, [families, searchQuery, selectedOccupation, selectedEthnicity, selectedReligion, selectedHousehold, selectedResident, selectedDisability, selectedGender, selectedDeath,  minAge, maxAge, selectedVillage, selectedWardVillageTract, selectedTownship, selectedDistrict, selectedStateRegion]);
+    // CSV Export End
 
     // Calculate total gender counts, family count, and household count for each village start
     const villageCounts = {};
@@ -663,120 +680,6 @@ const Dashboard = () => {
         householdCounts[householdNo]++;
     }
     });
-
-    // const villageSet = new Set();
-    // const villageCounts = {};
-    // const householdCounts = {};
-    // let totalFamilies = 0;
-    // let totalHouseholds = 0;
-    // let totalDeaths = 0;
-    // let totalDisabilities = 0;
-
-    // filterFamilies.forEach((family) => {
-    // const villageName = family.households?.villages?.name;
-    // const gender = family.gender;
-    // const isDeath = family.isDeath;
-    // const deaths = family.deaths?.length;
-    // const disabilities = family.disabilities?.length; // Update disabilities variable
-    // const householdNo = family.households?.household_no;
-        
-    // if (villageName && isDeath === 'No') {
-    //     if (!villageSet.has(villageName)) {
-    //     villageSet.add(villageName);
-    //     villageCounts[villageName] = {
-    //         maleCount: 0,
-    //         femaleCount: 0,
-    //         familyCount: 0,
-    //         householdCount: 0,
-    //         deathCount: 0,
-    //         disabilityCount: 0,
-    //     };
-    //     }
-
-    //     // Gender
-    //     if (gender === 'ကျား') {
-    //     villageCounts[villageName].maleCount++;
-    //     } else if (gender === 'မ') {
-    //     villageCounts[villageName].femaleCount++;
-    //     }
-
-    //     villageCounts[villageName].familyCount++;
-    //     totalFamilies++;
-    
-    //     if (deaths) {
-    //         villageCounts[villageName].deathCount++;
-    //         totalDeaths++;
-    //     }
-
-    //     if (disabilities) {
-    //     villageCounts[villageName].disabilityCount += disabilities;
-    //     totalDisabilities += disabilities;
-    //     }
-
-    //     if (householdNo) {
-    //     if (!householdCounts[villageName]) {
-    //         householdCounts[villageName] = new Set();
-    //     }
-    //     householdCounts[villageName].add(householdNo);
-    //     villageCounts[villageName].householdCount = householdCounts[villageName].size;
-    //     }
-
-    //     if (householdNo && !householdCounts[householdNo]) {
-    //     householdCounts[householdNo] = 0;
-    //     totalHouseholds++;
-    //     }
-
-    //     householdCounts[householdNo]++;
-    // }
-
-    // if (isDeath === 'Yes') {
-    //     if (!villageSet.has(villageName)) {
-    //     villageSet.add(villageName);
-    //     villageCounts[villageName] = {
-    //         maleCount: 0,
-    //         femaleCount: 0,
-    //         familyCount: 0,
-    //         householdCount: 0,
-    //         deathCount: 0,
-    //         disabilityCount: 0,
-    //     };
-    //     }
-
-    //     if (gender === 'ကျား') {
-    //     villageCounts[villageName].maleCount++;
-    //     } else if (gender === 'မ') {
-    //     villageCounts[villageName].femaleCount++;
-    //     }
-
-    //     if (deaths) {
-    //     villageCounts[villageName].deathCount++;
-    //     totalDeaths++;
-    //     }
-
-    //     villageCounts[villageName].familyCount++;
-    //     totalFamilies++;
-
-    //     if (disabilities) {
-    //     villageCounts[villageName].disabilityCount += disabilities;
-    //     totalDisabilities += disabilities;
-    //     }
-
-    //     if (householdNo) {
-    //     if (!householdCounts[villageName]) {
-    //         householdCounts[villageName] = new Set();
-    //     }
-    //     householdCounts[villageName].add(householdNo);
-    //     villageCounts[villageName].householdCount = householdCounts[villageName].size;
-    //     }
-
-    //     if (householdNo && !householdCounts[householdNo]) {
-    //     householdCounts[householdNo] = 0;
-    //     totalHouseholds++;
-    //     }
-
-    //     householdCounts[householdNo]++;
-    // }
-    // });
 
     const sortedVillages = Object.keys(villageCounts).sort((a, b) => {
     return villageCounts[b].familyCount - villageCounts[a].familyCount;
@@ -906,7 +809,18 @@ const Dashboard = () => {
             {/* Chart */}
             <section className="grid grid-cols-1 gap-4 py-4 md:grid-cols-3">
                 <div className="relative flex items-center col-span-2 p-8 bg-white rounded-lg shadow hover:bg-gray-100">
-
+                    <div className="absolute top-4 right-4">
+                        <button className="flex px-2 py-1 mr-1 text-sm text-white bg-gray-400 rounded-md">
+                        <DocumentArrowDownIcon className="w-5 h-5 mr-2" />
+                        <CSVLink
+                            data={csvData}
+                            filename={`village_data_${filterFamilies.length}.csv`}
+                            className="text-white"
+                        >
+                            Export to CSV
+                        </CSVLink>
+                        </button>
+                    </div>
                     <Bar
                         data={{
                         labels: barChartLabels,
@@ -965,7 +879,7 @@ const Dashboard = () => {
                                 font: {
                                 weight: 'bold',
                                 size: 14,
-                                padding: { top: 40, bottom: 0 }
+                                padding: { top: 40, bottom: 0 },
                                 },
                             },
                             },
@@ -973,6 +887,7 @@ const Dashboard = () => {
                         }}
                     />
                 </div>
+
                 <div className="relative flex items-center col-span-1 p-8 bg-white rounded-lg shadow hover:bg-gray-100">
                     
                     <Pie
@@ -1017,7 +932,6 @@ const Dashboard = () => {
                         },
                         }}
                     />
-                    
                 </div>
             </section>
             {/* Chart End       */}
@@ -1034,7 +948,7 @@ const Dashboard = () => {
                 />
                 <button
                     onClick={handleToggleFilter}
-                    className="px-4 py-2 text-white bg-blue-400 rounded-md"
+                    className="px-4 py-2 text-white rounded-md bg-sky-600 hover:bg-sky-700"
                 >
                 <GridFilterListIcon className="w-5 h-5 mr-2"></GridFilterListIcon>
                     Filter
@@ -1044,7 +958,7 @@ const Dashboard = () => {
             </div>
 
             {showFilter && (
-            <div className="py-4 sm:grid sm:grid-cols-6 sm:gap-4">
+            <div className="py-4 sm:grid sm:grid-cols-5 sm:gap-4">
                 <div>
                     <select
                     value={selectedHousehold}
@@ -1136,18 +1050,6 @@ const Dashboard = () => {
                         ))}
                     </select>
                 </div>
-                    
-                <div>
-                    <select value={selectedEducation} onChange={(e) => setSelectedEducation(e.target.value)} className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-sky-600 sm:text-sm sm:leading-6">
-                        <option value="">{t("filter.Educations")}</option>
-                        {/* Render Educations options */}
-                        {educations.map((education) => (
-                            <option key={education.id} value={education.name}>
-                            {education.name}
-                            </option>
-                        ))}
-                    </select>
-                </div>
 
                 <div>
                     <select value={selectedEthnicity} onChange={(e) => setSelectedEthnicity(e.target.value)} className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-sky-600 sm:text-sm sm:leading-6">
@@ -1230,7 +1132,6 @@ const Dashboard = () => {
                         ring: '1px inset #e2e8f0',
                         focusRing: '2px solid #93c5fd',
                         lineHeight: '1.25rem',
-                        fontSize: '1rem',
                         }}
                     />
                 </div>

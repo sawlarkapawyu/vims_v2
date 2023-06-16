@@ -3,12 +3,13 @@ import Sidebar from '@/components/admin/layouts/Sidebar'
 import Link from "next/link";
 import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/20/solid'
 import React, { useState, useEffect, useRef } from "react";
-import { BookOpenIcon, FolderPlusIcon, PencilSquareIcon, PrinterIcon, TrashIcon } from '@heroicons/react/24/outline';
+import { BookOpenIcon, DocumentArrowDownIcon, FolderPlusIcon, PencilSquareIcon, PrinterIcon, TrashIcon } from '@heroicons/react/24/outline';
 import { useUser, useSupabaseClient } from '@supabase/auth-helpers-react'
 import { useUserRoleCheck } from '/src/components/utilities/useUserRoleCheck.js';
 import { useReactToPrint } from 'react-to-print';
 import { useRouter } from 'next/router';
 import { formatDate, classNames } from '/src/components/utilities/tools.js';
+import { CSVLink } from "react-csv";
 
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { useTranslation } from "next-i18next";
@@ -21,13 +22,14 @@ export default function Deaths() {
     const { t } = useTranslation("");
     const [isLoading, setIsLoading] = useState(false);
     const [deaths, setDeaths] = useState([]);
+    const [csvData, setCSVData] = useState([]);
     
     useUserRoleCheck();
     
     useEffect(() => {
         fetchDeaths();
     }, []);
-
+    
     const fetchDeaths = async () => {
         setIsLoading(true);
         
@@ -47,36 +49,65 @@ export default function Deaths() {
         if (deathsError) {
           throw deathsError;
         }
-
+        
         setDeaths(deathsData);
         setIsLoading(false);
         return deathsData;
     };
-
+    
     const handleRegisterClick = () => {
         router.push('/admin/deaths/register');
     };
 
     // Search and filter state
     const [searchQuery, setSearchQuery] = useState('');
-
-    // Filtered deaths based on search and filters
     const filteredDeaths = deaths.filter((death) => {
         const isMatchingSearchQuery =
-        (death.death_date && death.death_date.toLowerCase().includes(searchQuery.toLowerCase())) ||
-        (death.death_place && death.death_place.toLowerCase().includes(searchQuery.toLowerCase())) ||
-        (death.complainant && death.complainant.toLowerCase().includes(searchQuery.toLowerCase())) ||
-        (death.remark && death.remark.toLowerCase().includes(searchQuery.toLowerCase())) ||
-        (death.families.name && death.families.name.toLowerCase().includes(searchQuery.toLowerCase())) ||
-        (death.families.date_of_birth && formatDate(death.families.date_of_birth).startsWith(searchQuery)) ||
-        (death.families.nrc_id && death.families.nrc_id.toLowerCase().includes(searchQuery.toLowerCase())) ||
-        (death.families.gender && death.families.gender.toLowerCase().includes(searchQuery.toLowerCase()));
-
-        return (
-        isMatchingSearchQuery
-        );
+          (death.death_date && death.death_date.toLowerCase().includes(searchQuery.toLowerCase())) ||
+          (death.death_place && death.death_place.toLowerCase().includes(searchQuery.toLowerCase())) ||
+          (death.complainant && death.complainant.toLowerCase().includes(searchQuery.toLowerCase())) ||
+          (death.remark && death.remark.toLowerCase().includes(searchQuery.toLowerCase())) ||
+          (death.families.name && death.families.name.toLowerCase().includes(searchQuery.toLowerCase())) ||
+          (death.families.date_of_birth && formatDate(death.families.date_of_birth).startsWith(searchQuery)) ||
+          (death.families.nrc_id && death.families.nrc_id.toLowerCase().includes(searchQuery.toLowerCase())) ||
+          (death.families.gender && death.families.gender.toLowerCase().includes(searchQuery.toLowerCase()));
+      
+        return isMatchingSearchQuery;
     });
 
+    // CSV Export Start
+    useEffect(() => {
+        const formattedData = filteredDeaths.map((death) => {
+            const familyName = death.families?.name;
+            const familyGender = death.families?.gender;
+            const familyDob = death.families?.date_of_birth;
+            const villageName = death.families?.households?.villages?.name;
+            const wardVillageTractName = death.families?.households?.ward_village_tracts?.name;
+            const townshipName = death.families?.households?.townships?.name;
+            const districtName = death.families?.households?.districts?.name;
+            const stateRegionName = death.families?.households?.state_regions?.name;
+        
+            return {
+            id: death.id.toString(),
+            name: familyName || '',
+            death_date: death.death_date,
+            death_place: death.death_place,
+            complainant: death.complainant,
+            remark: death.remark,
+            gender: familyGender || '',
+            dob: familyDob || '',
+            village: villageName || '',
+            ward_village_tract: wardVillageTractName || '',
+            township: townshipName || '',
+            district: districtName || '',
+            state_region: stateRegionName || '',
+            };
+        });
+        
+        setCSVData(formattedData);
+    }, [deaths, searchQuery]);
+    // CSV Export End
+    
     // Pagination Start
     const [currentPage, setCurrentPage] = useState(0);
     const [perPage] = useState(10);
@@ -177,9 +208,6 @@ export default function Deaths() {
     });
     //Print end
       
-      
-      
-
     return (
         <>
             <Head>
@@ -535,9 +563,14 @@ export default function Deaths() {
                             <PrinterIcon className="w-5 h-5 mr-2" />
                             Print
                         </button>
-                        <button className="flex px-4 py-2 text-white bg-blue-500 rounded-md">
-                            <BookOpenIcon className="w-5 h-5 mr-2" />
-                            Save as PDF
+                        <button className="flex px-4 py-2 mr-2 text-white rounded-md bg-sky-600 hover:bg-sky-700">
+                            <DocumentArrowDownIcon className="w-5 h-5 mr-2" />
+                            <CSVLink
+                                data={csvData}
+                                filename={`deaths_${filteredDeaths.length}.csv`}
+                            >
+                                Export CSV
+                            </CSVLink>
                         </button>
                     </div>
                 </div>

@@ -4,9 +4,10 @@ import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { useUser, useSupabaseClient } from '@supabase/auth-helpers-react'
 import { useReactToPrint } from 'react-to-print';
+import { CSVLink } from "react-csv";
 
 import { useRouter } from 'next/router';
-import { ChevronRightIcon, ChevronLeftIcon, TrashIcon, PencilSquareIcon, DocumentPlusIcon, PrinterIcon, BookOpenIcon } from '@heroicons/react/24/outline';
+import { ChevronRightIcon, ChevronLeftIcon, TrashIcon, PencilSquareIcon, DocumentPlusIcon, PrinterIcon, BookOpenIcon, DocumentArrowDownIcon } from '@heroicons/react/24/outline';
 import { formatDate, classNames, translateNumberToMyanmar } from '/src/components/utilities/tools.js';
 import { useUserRoleCheck } from '/src/components/utilities/useUserRoleCheck.js';
 
@@ -35,7 +36,7 @@ export default function Household() {
     const [selectedWardVillageTract, setSelectedWardVillageTract] = useState('');
     const [villages, setVillages] = useState([]);
     const [selectedVillage, setSelectedVillage] = useState('');
-    
+    const [csvData, setCSVData] = useState([]);
     
     useUserRoleCheck();
     
@@ -187,6 +188,32 @@ export default function Household() {
         );
     });
     
+    // CSV Export Start
+    useEffect(() => {
+        const formattedData = filteredHouseholds.map((household) => {
+            const villageName = household.villages?.name;
+            const wardVillageTractName = household.ward_village_tracts?.name;
+            const townshipName = household.townships?.name;
+            const districtName = household.districts?.name;
+            const stateRegionName = household.state_regions?.name;
+        
+            return {
+            id: household.id.toString(),
+            household_no: household.household_no,
+            house_no: household.house_no,
+            entry_date: household.entry_date,
+            village: villageName || '',
+            ward_village_tract: wardVillageTractName || '',
+            township: townshipName || '',
+            district: districtName || '',
+            state_region: stateRegionName || '',
+            };
+        });
+        
+        setCSVData(formattedData);
+    }, [households, searchQuery, selectedStateRegion, selectedDistrict, selectedTownship, selectedWardVillageTract,selectedVillage ]);
+    // CSV Export End
+
     const handleAddClick = () => {
         router.push('/admin/households/add');
     };
@@ -656,9 +683,14 @@ export default function Household() {
                         <PrinterIcon className="w-5 h-5 mr-2" />
                         Print
                     </button>
-                    <button className="flex px-4 py-2 text-white bg-blue-500 rounded-md">
-                        <BookOpenIcon className="w-5 h-5 mr-2" />
-                        Save as PDF
+                    <button className="flex px-4 py-2 mr-2 text-white rounded-md bg-sky-600 hover:bg-sky-700">
+                        <DocumentArrowDownIcon className="w-5 h-5 mr-2" />
+                        <CSVLink
+                            data={csvData}
+                            filename={`households_${filteredHouseholds?.length}.csv`}
+                        >
+                            Export CSV
+                        </CSVLink>
                     </button>
                 </div>
             </div>

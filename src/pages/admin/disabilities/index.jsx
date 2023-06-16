@@ -3,7 +3,7 @@ import Sidebar from '@/components/admin/layouts/Sidebar'
 import Link from "next/link";
 import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/20/solid'
 import React, { useState, useEffect, useRef } from "react";
-import { BookOpenIcon, FolderPlusIcon, PencilSquareIcon, PrinterIcon, TrashIcon } from '@heroicons/react/24/outline';
+import { BookOpenIcon, DocumentArrowDownIcon, FolderPlusIcon, PencilSquareIcon, PrinterIcon, TrashIcon } from '@heroicons/react/24/outline';
 import { useUser, useSupabaseClient } from '@supabase/auth-helpers-react'
 import { useUserRoleCheck } from '/src/components/utilities/useUserRoleCheck.js';
 import { useReactToPrint } from 'react-to-print';
@@ -28,21 +28,18 @@ export default function Disability() {
 
     useUserRoleCheck();
 
-
     useEffect(() => {
         fetchDisabilities();
     }, []);
-
+    
     const fetchDisabilities = async () => {
         setIsLoading(true);
-      
+    
         const { data: disabilityData, error: disabilityError } = await supabase
-          .from("disabilities")
+          .from('disabilities')
           .select(`
             id,
             description,
-            family_id,
-            type,
             type_of_disabilities (name),
             families (
               name,
@@ -59,21 +56,17 @@ export default function Disability() {
               )
             )
           `)
-          .order("id", { ascending: false });
-      
+          .order('id', { ascending: false });
+    
         if (disabilityError) {
           throw disabilityError;
         }
-      
+    
         setDisabilities(disabilityData);
-        setCSVData(disabilityData); // Set the CSV data
         setIsLoading(false);
-      
+    
         return disabilityData;
     };
-      
-      
-      
     
     const handleRegisterClick = () => {
         router.push('/admin/disabilities/register');
@@ -81,8 +74,6 @@ export default function Disability() {
 
     // Search and filter state
     const [searchQuery, setSearchQuery] = useState('');
-
-    // Filtered disabilities based on search and filters
     const filteredDisabilities = disabilities.filter((disability) => {
         const isMatchingSearchQuery =
         (disability.type_of_disabilities.name && disability.type_of_disabilities.name.toLowerCase().includes(searchQuery.toLowerCase())) ||
@@ -96,6 +87,39 @@ export default function Disability() {
         isMatchingSearchQuery
         );
     });
+
+    //CSV Export Start
+    useEffect(() => {
+        const formattedData = filteredDisabilities.map((disability) => {
+            const typeOfDisability = disability.type_of_disabilities?.name;
+            const familyName = disability.families?.name;
+            const familyGender = disability.families?.gender;
+            const familyDob = disability.families?.date_of_birth;
+            // const householdNo = disability.families?.households?.household_no;
+            const villageName = disability.families?.households?.villages?.name;
+            const wardVillageTractName = disability.families?.households?.ward_village_tracts?.name;
+            const townshipName = disability.families?.households?.townships?.name;
+            const districtName = disability.families?.households?.districts?.name;
+            const stateRegionName = disability.families?.households?.state_regions?.name;
+
+            return {
+                id: disability.id.toString(),
+                name: familyName ? familyName : '',
+                description: disability.description,
+                type_of_disabilities: typeOfDisability ? typeOfDisability : '',
+                gender: familyGender ? familyGender : '',
+                dob: familyDob ? familyDob : '',
+                // householdNo: householdNo ? householdNo : '',
+                village: villageName ? villageName : '',
+                ward_village_tract: wardVillageTractName ? wardVillageTractName : '',
+                township: townshipName ? townshipName : '',
+                district: districtName ? districtName : '',
+                state_region: stateRegionName ? stateRegionName : '',
+            };
+        });
+        setCSVData(formattedData);
+    }, [disabilities, searchQuery]);
+    //CSV Export End
 
     // Pagination Start
     const [currentPage, setCurrentPage] = useState(0);
@@ -186,8 +210,6 @@ export default function Disability() {
         },
     });
     //Print end
-
-    //Handle CSV
     
     return (
         <>
@@ -516,16 +538,14 @@ export default function Disability() {
                             <PrinterIcon className="w-5 h-5 mr-2" />
                             Print
                         </button>
-                        <button className="flex px-4 py-2 text-white bg-blue-500 rounded-md">
-                            
-                                <CSVLink
-                                    data={csvData}
-                                    filename={"disabilities.csv"}
-                                >
-                                   <BookOpenIcon className="w-5 h-5 mr-2" />
-                                    Export CSV
-                                </CSVLink>
-                               
+                        <button className="flex px-4 py-2 mr-2 text-white rounded-md bg-sky-600 hover:bg-sky-700">
+                            <DocumentArrowDownIcon className="w-5 h-5 mr-2" />
+                            <CSVLink
+                                data={csvData}
+                                filename={`disabilities_${filteredDisabilities.length}.csv`}
+                            >
+                                Export CSV
+                            </CSVLink>
                         </button>
                     </div>
                 </div>

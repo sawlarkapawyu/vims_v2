@@ -5,11 +5,12 @@ import { jsPDF } from 'jspdf';
 import 'jspdf-autotable';
 // import { useSupabaseClient } from '@supabase/auth-helpers-react'
 import { supabase } from "/src/components/utilities/supabase";
+import { CSVLink } from "react-csv";
 
 import DropdownSelect from 'react-dropdown-select';
 import { formatDate, classNames } from '/src/components/utilities/tools.js';
 import { useTranslation } from "next-i18next";
-import { BookOpenIcon, ChevronLeftIcon, ChevronRightIcon, PrinterIcon } from '@heroicons/react/24/outline';
+import { BookOpenIcon, ChevronLeftIcon, ChevronRightIcon, DocumentArrowDownIcon, PrinterIcon } from '@heroicons/react/24/outline';
 
 const Report = () => {
     // const supabase = useSupabaseClient();
@@ -36,8 +37,6 @@ const Report = () => {
 
     const [occupations, setOccupations] = useState([]);
     const [selectedOccupation, setSelectedOccupation] = useState('');
-    const [educations, setEducations] = useState([]);
-    const [selectedEducation, setSelectedEducation] = useState('');
     const [ethnicities, setEthnicities] = useState([]);
     const [selectedEthnicity, setSelectedEthnicity] = useState('');
     const [religions, setReligions] = useState([]);
@@ -50,13 +49,13 @@ const Report = () => {
     const [selectedResident, setSelectedResident] = useState([]);
     const [isDisability, setDisability] = useState([]);
     const [selectedDisability, setSelectedDisability] = useState('');
-    
+    const [csvData, setCSVData] = useState([]);
+
     useEffect(() => {
         const fetchData = async () => {
           try {
             fetchFamilies();
             fetchOccupation();
-            fetchEducation();
             fetchEthnicity();
             fetchReligion();
             fetchDeaths();
@@ -97,11 +96,10 @@ const Report = () => {
           disabilities (id),
           relationships (id, name),
           occupations (id, name),
-          educations (id, name),
           ethnicities (id, name),
           nationalities (id, name),
           religions (id, name),
-          households (household_no, state_regions(name), townships(name), districts(name), ward_village_tracts(name), villages(name)),
+          households (household_no, house_no, state_regions(name), townships(name), districts(name), ward_village_tracts(name), villages(name)),
           household_no
         `);
       
@@ -238,18 +236,6 @@ const Report = () => {
         }
     }
 
-    async function fetchEducation() {
-        try {
-          const { data, error } = await supabase.from('educations').select('id, name');
-          if (error) {
-            throw new Error(error.message);
-          }
-          setEducations(data);
-        } catch (error) {
-          console.log('Error fetching educations:', error.message);
-        }
-    }
-
     async function fetchEthnicity() {
         try {
           const { data, error } = await supabase.from('ethnicities').select('id, name');
@@ -347,6 +333,18 @@ const Report = () => {
         }
     }
     
+    //Multi Select resident start
+    const options = Object.keys(resident).map((residentValue) => ({
+        value: residentValue,
+        label: `${residentValue} (${resident[residentValue].length})`,
+    }));
+
+    const handleSelectChange = (selectedItems) => {
+    const selectedValues = selectedItems.map((item) => item.value);
+    setSelectedResident(selectedValues);
+    };
+    //Multi Select resident End
+
     // Function to check if the age matches the selected age filter
     const checkAge = (dateOfBirth) => {
         const today = new Date();
@@ -366,18 +364,6 @@ const Report = () => {
         const inputMaxAge = e.target.value !== '' ? parseInt(e.target.value) : '';
         setMaxAge(inputMaxAge);
     };
-
-    //Multi Select resident start
-    const options = Object.keys(resident).map((residentValue) => ({
-        value: residentValue,
-        label: `${residentValue} (${resident[residentValue].length})`,
-    }));
-
-    const handleSelectChange = (selectedItems) => {
-    const selectedValues = selectedItems.map((item) => item.value);
-    setSelectedResident(selectedValues);
-    };
-    //Multi Select resident End
     
     // Filtered faimiles based on search and filters  
     const filterFamilies = families.filter((family) => {
@@ -395,9 +381,6 @@ const Report = () => {
 
         const isMatchingOccupation =
         selectedOccupation === '' || family.occupations.name === selectedOccupation;
-
-        const isMatchingEducation =
-        selectedEducation === '' || family.educations.name === selectedEducation;
 
         const isMatchingEthnicity =
         selectedEthnicity === '' ||
@@ -435,7 +418,6 @@ const Report = () => {
         return (
             isMatchingDeath &&
             isMatchingOccupation &&
-            isMatchingEducation &&
             isMatchingEthnicity &&
             isMatchingReligion &&
             isMatchingGender &&
@@ -452,6 +434,58 @@ const Report = () => {
         );
     });
     
+    // CSV Export Start
+    useEffect(() => {
+        const formattedData = filterFamilies.map((family) => {
+            const relationshipName = family.relationships?.name;
+            const occupationName = family.occupations?.name;
+            const ethnicityName = family.ethnicities?.name;
+            const nationalityName = family.nationalities?.name;
+            const religionName = family.religions?.name;
+            const householdNo = family.households?.household_no;
+            const houseNo = family.households?.house_no;
+            const villageName = family.households?.villages?.name;
+            const wardVillageTractName = family.households?.ward_village_tracts?.name;
+            const townshipName = family.households?.townships?.name;
+            const districtName = family.households?.districts?.name;
+            const stateRegionName = family.households?.state_regions?.name;
+
+            const age = checkAge(family.date_of_birth)
+            ? Math.floor((new Date() - new Date(family.date_of_birth)) / (365.25 * 24 * 60 * 60 * 1000))
+            : '';
+
+            return {
+            id: family.id.toString(),
+            name: family.name,
+            dob: family.date_of_birth,
+            age: age,
+            nrc: family.nrc_id,
+            gender: family.gender,
+            father_name: family.father_name,
+            mother_name: family.mother_name,
+            resident: family.resident,
+            is_death: family.isDeath,
+            is_disability: family.isDisability,
+            relationship_name: relationshipName || '',
+            occupation_name: occupationName || '',
+            ethnicity_name: ethnicityName || '',
+            nationality_name: nationalityName || '',
+            religion_name: religionName || '',
+            household_no: householdNo || '',
+            house_no: houseNo || '',
+
+            village: villageName || '',
+            ward_village_tract: wardVillageTractName || '',
+            township: townshipName || '',
+            district: districtName || '',
+            state_region: stateRegionName || '',
+            };
+        });
+        
+        setCSVData(formattedData);
+    }, [families, searchQuery, selectedOccupation, selectedEthnicity, selectedReligion, selectedHousehold, selectedResident, selectedDisability, selectedGender, selectedDeath,  minAge, maxAge, selectedVillage, selectedWardVillageTract, selectedTownship, selectedDistrict, selectedStateRegion]);
+    // CSV Export End
+
     // Pagination Start
     const [currentPage, setCurrentPage] = useState(0);
     const [perPage] = useState(10);
@@ -524,7 +558,7 @@ const Report = () => {
                 />
                 <button
                     onClick={handleToggleFilter}
-                    className="px-4 py-2 text-white bg-blue-400 rounded-md"
+                    className="px-4 py-2 text-white rounded-md bg-sky-600 hover:bg-sky-700"
                 >
                 <GridFilterListIcon className="w-5 h-5 mr-2"></GridFilterListIcon>
                     Filter
@@ -534,7 +568,7 @@ const Report = () => {
             </div>
 
             {showFilter && (
-            <div className="py-4 sm:grid sm:grid-cols-6 sm:gap-4">
+            <div className="py-4 sm:grid sm:grid-cols-5 sm:gap-4">
                 <div>
                     <select
                     value={selectedHousehold}
@@ -627,18 +661,6 @@ const Report = () => {
                         ))}
                     </select>
                 </div>
-                    
-                <div>
-                    <select value={selectedEducation} onChange={(e) => setSelectedEducation(e.target.value)} className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-sky-600 sm:text-sm sm:leading-6">
-                        <option value="">{t("filter.Educations")}</option>
-                        {/* Render Educations options */}
-                        {educations.map((education) => (
-                            <option key={education.id} value={education.name}>
-                            {education.name}
-                            </option>
-                        ))}
-                    </select>
-                </div>
 
                 <div>
                     <select value={selectedEthnicity} onChange={(e) => setSelectedEthnicity(e.target.value)} className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-sky-600 sm:text-sm sm:leading-6">
@@ -720,7 +742,6 @@ const Report = () => {
                         color: '#4b5563',
                         ring: '1px inset #e2e8f0',
                         focusRing: '2px solid #93c5fd',
-                        fontSize: '0.875rem',
                         lineHeight: '1.25rem',
                         }}
                     />
@@ -948,9 +969,14 @@ const Report = () => {
                     <PrinterIcon className="w-5 h-5 mr-2" />
                     Print
                 </button>
-                <button className="flex px-4 py-2 text-white bg-blue-500 rounded-md">
-                    <BookOpenIcon className="w-5 h-5 mr-2" />
-                    Save as PDF
+                <button className="flex px-4 py-2 mr-2 text-white rounded-md bg-sky-600 hover:bg-sky-700">
+                    <DocumentArrowDownIcon className="w-5 h-5 mr-2" />
+                    <CSVLink
+                        data={csvData}
+                        filename={`reports_${filterFamilies.length}.csv`}
+                    >
+                        Export CSV
+                    </CSVLink>
                 </button>
             </div>
         </div>

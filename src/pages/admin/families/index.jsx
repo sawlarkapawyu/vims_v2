@@ -5,9 +5,10 @@ import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { useUser, useSupabaseClient } from '@supabase/auth-helpers-react'
 import { useReactToPrint } from 'react-to-print';
+import { CSVLink } from "react-csv";
 
 import { useRouter } from 'next/router';
-import { BookOpenIcon, ChevronLeftIcon, ChevronRightIcon, DocumentPlusIcon, PencilSquareIcon, PrinterIcon, TrashIcon } from '@heroicons/react/24/outline';
+import { BookOpenIcon, ChevronLeftIcon, ChevronRightIcon, DocumentArrowDownIcon, DocumentPlusIcon, PencilSquareIcon, PrinterIcon, TrashIcon } from '@heroicons/react/24/outline';
 import { formatDate, classNames } from '/src/components/utilities/tools.js';
 import { useUserRoleCheck } from '/src/components/utilities/useUserRoleCheck.js';
 
@@ -23,15 +24,14 @@ export default function Family() {
     const [isLoading, setIsLoading] = useState(false);
     const [errorMessage, setErrorMessage] = useState("");
     const [families, setFamilies] = useState([]);
-    
+    const [csvData, setCSVData] = useState([]);
+
     // Search and filter state
     const [searchQuery, setSearchQuery] = useState('');
     // const [relationships, setRelationships] = useState([]);
     // const [selectedRelationship, setSelectedRelationship] = useState('');
     const [occupations, setOccupations] = useState([]);
     const [selectedOccupation, setSelectedOccupation] = useState('');
-    const [educations, setEducations] = useState([]);
-    const [selectedEducation, setSelectedEducation] = useState('');
     const [ethnicities, setEthnicities] = useState([]);
     const [selectedEthnicity, setSelectedEthnicity] = useState('');
     // const [nationalities, setNationalities] = useState([]);
@@ -45,7 +45,6 @@ export default function Family() {
     
     useEffect(() => {
         fetchFamilies();
-        fetchEducation();
         fetchEthnicity();
         fetchHousehold();
         // fetchNationality();
@@ -68,9 +67,10 @@ export default function Family() {
             father_name,
             mother_name,
             remark,
+            isDeath,
+            isDisability,
             relationships (name),
             occupations (name),
-            educations (name),
             ethnicities (name),
             nationalities (name),
             religions (name),
@@ -115,18 +115,6 @@ export default function Family() {
           setOccupations(data);
         } catch (error) {
           console.log('Error fetching occupations:', error.message);
-        }
-    }
-
-    async function fetchEducation() {
-        try {
-          const { data, error } = await supabase.from('educations').select('id, name');
-          if (error) {
-            throw new Error(error.message);
-          }
-          setEducations(data);
-        } catch (error) {
-          console.log('Error fetching educations:', error.message);
         }
     }
 
@@ -191,9 +179,6 @@ export default function Family() {
         const isMatchingOccupation =
         selectedOccupation === '' || family.occupations.name === selectedOccupation;
 
-        const isMatchingEducation =
-        selectedEducation === '' || family.educations.name === selectedEducation;
-
         const isMatchingEthnicity =
         selectedEthnicity === '' ||
         family.ethnicities.name === selectedEthnicity;
@@ -205,12 +190,45 @@ export default function Family() {
         return (
         isMatchingSearchQuery &&
         isMatchingOccupation &&
-        isMatchingEducation &&
         isMatchingEthnicity &&
         isMatchingReligion &&
         isMatchingHousehold
         );
     });
+
+    // CSV Export Start
+    useEffect(() => {
+        const formattedData = filteredFamilies.map((family) => {
+            const relationshipName = family.relationships?.name;
+            const occupationName = family.occupations?.name;
+            const ethnicityName = family.ethnicities?.name;
+            const nationalityName = family.nationalities?.name;
+            const religionName = family.religions?.name;
+            const householdNo = family.households?.household_no;
+        
+            return {
+            id: family.id.toString(),
+            name: family.name,
+            dob: family.date_of_birth,
+            nrc: family.nrc_id,
+            gender: family.gender,
+            father_name: family.father_name,
+            mother_name: family.mother_name,
+            resident: family.resident,
+            is_death: family.isDeath,
+            is_disability: family.isDisability,
+            relationship_name: relationshipName || '',
+            occupation_name: occupationName || '',
+            ethnicity_name: ethnicityName || '',
+            nationality_name: nationalityName || '',
+            religion_name: religionName || '',
+            household_no: householdNo || '',
+            };
+        });
+        
+        setCSVData(formattedData);
+    }, [families, searchQuery, selectedOccupation, selectedEthnicity, selectedReligion, selectedHousehold]);
+    // CSV Export End
 
     // Pagination Start
     const [currentPage, setCurrentPage] = useState(0);
@@ -366,7 +384,7 @@ export default function Family() {
                         <p className="text-left text-gray-500 sm:text-left">
                             {t("filter.TotalResults")}: {filteredFamilies.length}
                         </p>
-                        <div className="py-4 sm:grid sm:grid-cols-6 sm:gap-4">
+                        <div className="py-4 sm:grid sm:grid-cols-5 sm:gap-4">
                             <div className="relative flex items-center mt-2">
                                 <input
                                 type="text"
@@ -403,18 +421,6 @@ export default function Family() {
                                     {occupations.map((occupation) => (
                                         <option key={occupation.id} value={occupation.name}>
                                         {occupation.name}
-                                        </option>
-                                    ))}
-                                </select>
-                            </div>
-                                
-                            <div>
-                                <select value={selectedEducation} onChange={(e) => setSelectedEducation(e.target.value)} className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-sky-600 sm:text-sm sm:leading-6">
-                                    <option value="">{t("filter.Educations")}</option>
-                                    {/* Render Educations options */}
-                                    {educations.map((education) => (
-                                        <option key={education.id} value={education.name}>
-                                        {education.name}
                                         </option>
                                     ))}
                                 </select>
@@ -518,12 +524,6 @@ export default function Family() {
                                             >
                                                 {t("Occupation")}
                                             </th> 
-                                            <th
-                                                scope="col"
-                                                className="sticky top-0 z-10 border-b border-gray-300 bg-white bg-opacity-75 py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 backdrop-blur backdrop-filter sm:pl-8 lg:pl-8"
-                                            >
-                                                {t("Education")}
-                                            </th>  
                                             <th
                                                 scope="col"
                                                 className="sticky top-0 z-10 border-b border-gray-300 bg-white bg-opacity-75 py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 backdrop-blur backdrop-filter sm:pl-8 lg:pl-8"
@@ -674,14 +674,6 @@ export default function Family() {
                                                 'whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6 lg:pl-8'
                                             )}
                                             >
-                                            {family.educations.name}
-                                            </td>
-                                            <td
-                                            className={classNames(
-                                                familyIdx !== family.length - 1 ? 'border-b border-gray-200' : '',
-                                                'whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6 lg:pl-8'
-                                            )}
-                                            >
                                             {family.ethnicities.name}
                                             </td>
                                             <td
@@ -777,9 +769,14 @@ export default function Family() {
                             <PrinterIcon className="w-5 h-5 mr-2" />
                             Print
                         </button>
-                        <button className="flex px-4 py-2 text-white bg-blue-500 rounded-md">
-                            <BookOpenIcon className="w-5 h-5 mr-2" />
-                            Save as PDF
+                        <button className="flex px-4 py-2 mr-2 text-white rounded-md bg-sky-600 hover:bg-sky-700">
+                            <DocumentArrowDownIcon className="w-5 h-5 mr-2" />
+                            <CSVLink
+                                data={csvData}
+                                filename={`populations_${filteredFamilies.length}.csv`}
+                            >
+                                Export CSV
+                            </CSVLink>
                         </button>
                     </div>
                 </div>
