@@ -25,7 +25,7 @@ export function useUserRoleCheck() {
           // User has the required role
         } else {
           setAlertMessage('User does not have the required role');
-          router.push('/login'); // Redirect to the login page
+          router.push('/auth401'); // Redirect to the login page
         }
       } catch (error) {
         console.error('Error checking user role:', error.message);
@@ -38,7 +38,7 @@ export function useUserRoleCheck() {
       checkUserRole();
     } else {
       setAlertMessage('User not logged in');
-      router.push('/login');
+      router.push('/auth401');
     }
   }, [user, router, supabase]);
 
