@@ -65,7 +65,6 @@ export default function DisibilitySearch() {
                     isDisability,
                     relationships (name),
                     occupations (name),
-                    educations (name),
                     ethnicities (name),
                     nationalities (name),
                     religions (name),

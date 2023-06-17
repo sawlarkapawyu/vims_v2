@@ -97,61 +97,6 @@ export default function HouseholdEdit() {
         }
     };
 
-    //Education
-    const [educations, setEducations] = useState([]);
-    const [selectedEducation, setSelectedEducation] = useState('');
-    const [newEducation, setNewEducation] = useState('');
-    const [showModalEducation, setShowModalEducation] = useState(false);
-
-    const handleCloseModalEducation = () => {
-        setShowModalEducation(false);
-        setNewEducation('');
-    };
-
-    const fetchEducations = async () => {
-        const { data, error } = await supabase.from('educations').select('*');
-
-        if (error) {
-            console.log(error);
-        } else {
-            setEducations(data);
-        }
-    };
-
-    const handleEducationChange = (e) => {
-        setSelectedEducation(e.target.value);
-        if (e.target.value === "new") {
-            setShowModalEducation(true);
-        }
-    };
-
-    const handleNewEducationChange = (e) => {
-        setNewEducation(e.target.value);
-    };
-    
-    const handleNewEducationSubmit = async () => {
-        if (newEducation) {
-          const { data, error } = await supabase.from('educations').insert({ name: newEducation });
-      
-          // Call fetchOccupations to refresh the list
-          fetchEducations();
-      
-          // Close the modal box
-          setShowModalEducation(false);
-      
-          if (error) {
-            console.log(error);
-          } else {
-            if (data) {
-              setEducations([...educations, data[0]]);
-              setSelectedEducation(data[0].id); // Set the selected education to the newly added education
-            }
-            setNewEducation('');
-            setShowModalEducation(false);
-          }
-        }
-    };
-
     //Relationship
     const [relationships, setRelationships] = useState([]);
     const [selectedRelationship, setSelectedRelationship] = useState(null);
@@ -458,7 +403,6 @@ export default function HouseholdEdit() {
 
     useEffect(() => {
         fetchOccupations();
-        fetchEducations();
         fetchRelationships();
         fetchEthnicities();
         fetchNationalities();
@@ -480,7 +424,6 @@ export default function HouseholdEdit() {
                 isDeath,
                 relationship_id,
                 occupation_id,
-                education_id,
                 ethnicity_id,
                 nationality_id,
                 religion_id,
@@ -504,7 +447,6 @@ export default function HouseholdEdit() {
             setSelectedRelationship(familyData.relationship_id);
             setSelectedOccupation(familyData.occupation_id);
             setSelectedEthnicity(familyData.ethnicity_id);
-            setSelectedEducation(familyData.education_id);
             setSelectedNationality(familyData.nationality_id);
             setSelectedReligion(familyData.religion_id);
             setSelectedHousehold(familyData.household_no);
@@ -532,7 +474,6 @@ export default function HouseholdEdit() {
                 !remark ||
                 !selectedRelationship ||
                 !selectedOccupation ||
-                !selectedEducation ||
                 !selectedEthnicity ||
                 !selectedNationality ||
                 !selectedReligion ||
@@ -555,7 +496,6 @@ export default function HouseholdEdit() {
                     resident: resident,
                     relationship_id: selectedRelationship,
                     occupation_id: selectedOccupation,
-                    education_id: selectedEducation,
                     ethnicity_id: selectedEthnicity,
                     nationality_id: selectedNationality,
                     religion_id: selectedReligion,
@@ -597,7 +537,6 @@ export default function HouseholdEdit() {
                 isDeath,
                 relationship_id,
                 occupation_id,
-                education_id,
                 ethnicity_id,
                 nationality_id,
                 religion_id,
@@ -621,7 +560,6 @@ export default function HouseholdEdit() {
             setSelectedRelationship(familyData.relationship_id);
             setSelectedOccupation(familyData.occupation_id);
             setSelectedEthnicity(familyData.ethnicity_id);
-            setSelectedEducation(familyData.education_id);
             setSelectedNationality(familyData.nationality_id);
             setSelectedReligion(familyData.religion_id);
             setSelectedHousehold(familyData.household_no);
@@ -937,76 +875,6 @@ export default function HouseholdEdit() {
                                                         type="button"
                                                         className="inline-block w-full px-4 py-2 ml-2 text-base font-medium text-gray-700 bg-gray-200 border border-transparent rounded-md shadow-sm hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 sm:text-sm"
                                                         onClick={handleCloseModalOccupation}
-                                                    >
-                                                        {t("other.Cancel")}
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                )}
-                            </div>
-                            
-                            {/* Education */}
-                            <div className="col-span-1 px-3 py-3 mt-3 md:col-span-1">
-                                <label htmlFor="" className="block text-sm font-medium leading-6 text-gray-900">
-                                    {t("Education")}
-                                </label>
-                                <div className="relative mt-2">
-                                    <select
-                                        id="education"
-                                        value={selectedEducation}
-                                        onChange={handleEducationChange}
-                                        className="block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-sky-600 sm:text-sm sm:leading-6"
-                                    >
-                                        <option value="">{t("other.Choose")}</option>
-                                        {educations.map((education) => (
-                                        <option key={education.id} value={education.id}>
-                                            {education.name}
-                                        </option>
-                                        ))}
-                                        <option disabled>──────────</option>
-                                        <option value="new" className="font-medium text-blue-500">
-                                            {t("other.Add")}
-                                        </option>
-                                    </select>
-                                </div>
-                                {showModalEducation && (
-                                    <div className="fixed inset-0 z-10 overflow-y-auto">
-                                        <div className="flex items-end justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
-                                            <div className="fixed inset-0 transition-opacity" aria-hidden="true">
-                                                <div className="absolute inset-0 bg-gray-300 opacity-75"></div>
-                                            </div>
-                                            <span className="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-                                            <div className="inline-block px-4 pt-5 pb-4 overflow-hidden text-left align-bottom transition-all transform bg-white rounded-lg shadow-xl sm:my-8 sm:align-middle sm:p-6">
-                                            <div>
-                                                <div className="mt-3 text-center sm:mt-5">
-                                                    <h3 className="text-lg font-medium leading-6 text-gray-900">{t("other.Add")} - {t("Education")}</h3>
-                                                    <div className="mt-2">
-                                                        <input
-                                                        type="text"
-                                                        name="newEducation"
-                                                        id="newEducation"
-                                                        value={newEducation}
-                                                        onChange={handleNewEducationChange}
-                                                        className="block w-full px-3 py-2 mt-2 mb-2 border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                                                        />
-                                                    </div>
-                                                </div>
-                                                <div className="flex justify-between mt-5 sm:mt-6">
-                                                    <button
-                                                        type="button"
-                                                        className="inline-block w-full py-2 text-base font-medium text-white border border-transparent rounded-md shadow-sm bg-sky-600 hover:bg-sky-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sky-500 sm:text-sm disabled:opacity-50"
-                                                        disabled={!selectedEducation && !newEducation}
-                                                        onClick={handleNewEducationSubmit}
-                                                    >
-                                                        {t("other.Submit")}
-                                                    </button>
-                                                    <button
-                                                        type="button"
-                                                        className="inline-block w-full px-4 py-2 ml-2 text-base font-medium text-gray-700 bg-gray-200 border border-transparent rounded-md shadow-sm hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 sm:text-sm"
-                                                        onClick={handleCloseModalEducation}
                                                     >
                                                         {t("other.Cancel")}
                                                     </button>
