@@ -811,13 +811,14 @@ const Dashboard = () => {
                     <div className="absolute top-4 right-4">
                         <button className="flex px-2 py-1 mr-1 text-sm text-white bg-gray-400 rounded-md">
                         <DocumentArrowDownIcon className="w-5 h-5 mr-2" />
-                        <CSVLink
+                        {/* <CSVLink
                             data={csvData}
                             filename={`village_data_${filterFamilies.length}.csv`}
                             className="text-white"
                         >
                             Export to CSV
-                        </CSVLink>
+                        </CSVLink> */}
+                        Export to CSV
                         </button>
                     </div>
                     <Bar
