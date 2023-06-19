@@ -24,7 +24,7 @@
     "Officer": "Officer Role",
     "OfficerDescription": "As an Officer, you play a crucial role in managing the system. You have the authority to manage households, population records, death records, and disability information. You can contribute to the accurate and up-to-date data in the system. Furthermore, you have access to reports and a dashboard to monitor and analyze relevant information.",
     "Villager": "Villager/Visitor Role",
-    "VillagerDescription": "As a Villager or Visitor, your role is focused on accessing information. You can explore the system's dashboard, which provides a snapshot of relevant data and statistics. However, you do not have direct permissions to update or manage the data."
+    "VillagerDescription": "As a Villager or Visitor, your role is focused on accessing information. You can explore the system's dashboard and download dataset, which provides a snapshot of relevant data and statistics. However, you do not have direct permissions to update or manage the data."
   },
   "profile": {
     "Title": "User Profile",
