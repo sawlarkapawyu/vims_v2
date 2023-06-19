@@ -350,12 +350,15 @@ const Report = () => {
         const today = new Date();
         const birthDate = new Date(dateOfBirth);
         const age = today.getFullYear() - birthDate.getFullYear();
-        // const monthDiff = today.getMonth() - birthDate.getMonth();
+        const monthDiff = today.getMonth() - birthDate.getMonth();
+        const dayDiff = today.getDate() - birthDate.getDate();
         const isMatchingAge =
-          (minAge === '' || age >= minAge) && (maxAge === '' || age <= maxAge);
-    
+          (minAge === '' || (age > minAge) || (age === minAge && (monthDiff > 0 || (monthDiff === 0 && dayDiff >= 0)))) &&
+          (maxAge === '' || (age < maxAge) || (age === maxAge && (monthDiff < 0 || (monthDiff === 0 && dayDiff <= 0))));
+        
         return isMatchingAge;
-    };
+    };  
+
     const handleMinAgeChange = (e) => {
         const inputMinAge = e.target.value !== '' ? parseInt(e.target.value) : '';
         setMinAge(inputMinAge);
