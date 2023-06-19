@@ -535,7 +535,7 @@ const Dashboard = () => {
 
     // CSV Export Start
     useEffect(() => {
-        const formattedData = filterFamilies.map((family) => {
+        const formattedData = filterFamilies.map((family, index) => {
             const occupationName = family.occupations?.name;
             const ethnicityName = family.ethnicities?.name;
             const religionName = family.religions?.name;
@@ -549,7 +549,7 @@ const Dashboard = () => {
             : '';
             
             return {
-            id: family.id.toString(),
+            no: (index + 1).toString(),
             age: age,            
             gender: family.gender,
             resident: family.resident,
@@ -784,7 +784,6 @@ const Dashboard = () => {
                     </div>
                     <div className="absolute bottom-0 left-0 w-full h-1 bg-blue-400" />
                 </div>
-
                 <div className="relative flex items-center p-8 bg-white rounded-lg shadow hover:bg-gray-100">
                     <div className="inline-flex items-center justify-center flex-shrink-0 w-16 h-16 mr-6 text-blue-400 bg-blue-100 rounded-full">
                         <svg
