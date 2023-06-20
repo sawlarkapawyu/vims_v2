@@ -460,7 +460,7 @@ const Report = () => {
             return {
             id: family.id.toString(),
             name: family.name,
-            dob: family.date_of_birth,
+            dob: formatDate(family.date_of_birth),
             age: age,
             nrc: family.nrc_id,
             gender: family.gender,

@@ -59,7 +59,8 @@
       "Male": "Male",
       "Female": "Female",
       "Populations": "Populations",
-      "Households": "Households"
+      "Households": "Households",
+      "AverageAge": "Average Age"
     },
     "report": {
       "Reports": "Reports"

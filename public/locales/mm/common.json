@@ -59,7 +59,8 @@
         "Male": "ကျား",
         "Female": "မ",
         "Populations": "လူဉီးရေ",
-        "Households": "အိမ်ထောင်စု"
+        "Households": "အိမ်ထောင်စု",
+        "AverageAge": "ပျမ်းမျှအသက်"
     },
     "report": {
         "Reports": "အစီရင်ခံစာများ"

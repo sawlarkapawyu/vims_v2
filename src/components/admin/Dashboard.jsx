@@ -465,6 +465,7 @@ const Dashboard = () => {
     };
     //Multi Select resident End
     
+          
     // Filtered faimiles based on search and filters
     const filterFamilies = families.filter((family) => {
         const isMatchingSearchQuery =
@@ -494,6 +495,7 @@ const Dashboard = () => {
         const isMatchingReligion = selectedReligion === '' || family.religions.name === selectedReligion;
         
         const isMatchingAge = checkAge(family.date_of_birth);
+        
 
         const isMatchingGender =
         selectedGender === '' || family.gender === selectedGender;
@@ -572,8 +574,34 @@ const Dashboard = () => {
         setCSVData(formattedData);
     }, [families, searchQuery, selectedOccupation, selectedEthnicity, selectedReligion, selectedHousehold, selectedResident, selectedDisability, selectedGender, selectedDeath,  minAge, maxAge, selectedVillage, selectedWardVillageTract, selectedTownship, selectedDistrict, selectedStateRegion]);
     // CSV Export End
+    
+
+    function calculateAge(dateOfBirth) {
+        const today = new Date();
+        const birthDate = new Date(dateOfBirth);
+        
+        const yearsDiff = today.getFullYear() - birthDate.getFullYear();
+        const monthsDiff = today.getMonth() - birthDate.getMonth();
+        const daysDiff = today.getDate() - birthDate.getDate();
+        
+        if (
+          yearsDiff < 0 ||
+          (yearsDiff === 0 && monthsDiff < 0) ||
+          (yearsDiff === 0 && monthsDiff === 0 && daysDiff < 0)
+        ) {
+          return -1; // Invalid date of birth
+        }
+        
+        let age = yearsDiff;
+        if (monthsDiff < 0 || (monthsDiff === 0 && daysDiff < 0)) {
+          age--; // Adjust age if birthdate is later in the year
+        }
+        
+        return age;
+    }
 
     // Calculate total gender counts, family count, and household count for each village start
+
     const villageCounts = {};
     const householdCounts = {};
     let totalFamilies = 0;
@@ -588,6 +616,7 @@ const Dashboard = () => {
     const deaths = family.deaths?.length;
     const disabilities = family.disabilities?.length;
     const householdNo = family.households?.household_no;
+    const age  = calculateAge(family.date_of_birth);
 
     if (villageName && isDeath === 'No') {
         if (!villageCounts[villageName]) {
@@ -598,6 +627,8 @@ const Dashboard = () => {
             householdCount: 0,
             deathCount: 0,
             disabilityCount: 0,
+            totalAge: 0,
+            totalMembers: 0,
         };
         }
 
@@ -634,6 +665,9 @@ const Dashboard = () => {
         }
 
         householdCounts[householdNo]++;
+
+        villageCounts[villageName].totalAge += age;
+        villageCounts[villageName].totalMembers++;
     }
 
     if (isDeath === 'Yes') {
@@ -645,6 +679,8 @@ const Dashboard = () => {
             householdCount: 0,
             deathCount: 0,
             disabilityCount: 0,
+            totalAge: 0,
+            totalMembers: 0,
         };
         }
 
@@ -681,14 +717,22 @@ const Dashboard = () => {
         }
 
         householdCounts[householdNo]++;
+
+        villageCounts[villageName].totalAge += age;
+        villageCounts[villageName].totalMembers++;
     }
     });
+
+    for (const villageName in villageCounts) {
+        const village = villageCounts[villageName];
+        const averageAge = village.totalMembers !== 0 ? village.totalAge / village.totalMembers : 0;
+        console.log(`Average Age for ${villageName}: ${averageAge}`);
+    }
 
     const sortedVillages = Object.keys(villageCounts).sort((a, b) => {
     return villageCounts[b].familyCount - villageCounts[a].familyCount;
     });
     // Calculate total gender counts, family count, and household count for each village end
-    
 
     //Chart start
     const barChartLabels = sortedVillages;
@@ -1195,6 +1239,12 @@ const Dashboard = () => {
                                     scope="col"
                                     className="sticky top-0 z-10 border-b border-gray-300 bg-white bg-opacity-75 py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 backdrop-blur backdrop-filter sm:pl-6 lg:pl-8"
                                 >
+                                     {t("dashboard.AverageAge")}
+                                </th>
+                                <th
+                                    scope="col"
+                                    className="sticky top-0 z-10 border-b border-gray-300 bg-white bg-opacity-75 py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 backdrop-blur backdrop-filter sm:pl-6 lg:pl-8"
+                                >
                                     {t("dashboard.TotalHouseholds")}
                                 </th>
                                 <th
@@ -1221,6 +1271,7 @@ const Dashboard = () => {
 
                                 {sortedVillages.map((villageName, familyIdx) => {
                                     const counts = villageCounts[villageName];
+                                    const averageAge = counts.totalMembers !== 0 ? counts.totalAge / counts.totalMembers : 0;
 
                                 return (
                                 <tr key={villageName} className="transition duration-300 ease-in-out border-b hover:bg-neutral-100 dark:border-neutral-500 dark:hover:bg-neutral-600">
@@ -1255,6 +1306,14 @@ const Dashboard = () => {
                                     )}
                                     >
                                     {counts.familyCount}
+                                    </td>
+                                    <td
+                                    className={classNames(
+                                        familyIdx !== villageName.length - 1 ? "border-b border-gray-200" : "",
+                                        "whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6 lg:pl-8"
+                                    )}
+                                    >
+                                    {averageAge.toFixed(2)}
                                     </td>
                                     <td
                                     className={classNames(
