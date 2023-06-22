@@ -11,6 +11,7 @@ import { Bar, Pie } from 'react-chartjs-2';
 import { Chart, LinearScale, CategoryScale, BarController, BarElement, ArcElement, Tooltip, Legend, Title } from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 import { UserIcon } from '@heroicons/react/20/solid';
+import { formatDate, getDateValue } from '../utilities/tools';
 
 Chart.register(LinearScale, CategoryScale, BarController, BarElement, ArcElement, ChartDataLabels, Tooltip, Legend, Title);
 
@@ -576,29 +577,42 @@ const Dashboard = () => {
     // CSV Export End
     
 
-    function calculateAge(dateOfBirth) {
+    // function calculateAge(dateOfBirth) {
+    //     const today = new Date();
+    //     const birthDate = new Date(dateOfBirth);
+        
+    //     const yearsDiff = today.getFullYear() - birthDate.getFullYear();
+    //     const monthsDiff = today.getMonth() - birthDate.getMonth();
+    //     const daysDiff = today.getDate() - birthDate.getDate();
+        
+    //     if (
+    //       yearsDiff < 0 ||
+    //       (yearsDiff === 0 && monthsDiff < 0) ||
+    //       (yearsDiff === 0 && monthsDiff === 0 && daysDiff < 0)
+    //     ) {
+    //       return -1; // Invalid date of birth
+    //     }
+        
+    //     let age = yearsDiff;
+    //     if (monthsDiff < 0 || (monthsDiff === 0 && daysDiff < 0)) {
+    //       age--; // Adjust age if birthdate is later in the year
+    //     }
+        
+    //     return age;
+    // }
+
+    const calculateAge = (dateOfBirth) => {
         const today = new Date();
         const birthDate = new Date(dateOfBirth);
-        
-        const yearsDiff = today.getFullYear() - birthDate.getFullYear();
-        const monthsDiff = today.getMonth() - birthDate.getMonth();
-        const daysDiff = today.getDate() - birthDate.getDate();
-        
-        if (
-          yearsDiff < 0 ||
-          (yearsDiff === 0 && monthsDiff < 0) ||
-          (yearsDiff === 0 && monthsDiff === 0 && daysDiff < 0)
-        ) {
-          return -1; // Invalid date of birth
-        }
-        
-        let age = yearsDiff;
-        if (monthsDiff < 0 || (monthsDiff === 0 && daysDiff < 0)) {
-          age--; // Adjust age if birthdate is later in the year
-        }
+        const yearDiff = today.getFullYear() - birthDate.getFullYear();
+        const monthDiff = today.getMonth() - birthDate.getMonth();
+        const dayDiff = today.getDate() - birthDate.getDate();
+
+        const age = yearDiff + (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0) ? -1 : 0 );
         
         return age;
-    }
+    };      
+      
 
     // Calculate total gender counts, family count, and household count for each village start
 
@@ -610,13 +624,14 @@ const Dashboard = () => {
     let totalDisabilities = 0;
 
     filterFamilies.forEach((family) => {
-    const villageName = family.households?.villages?.name;
-    const gender = family.gender;
-    const isDeath = family.isDeath;
-    const deaths = family.deaths?.length;
-    const disabilities = family.disabilities?.length;
-    const householdNo = family.households?.household_no;
-    const age  = calculateAge(family.date_of_birth);
+        const villageName = family.households?.villages?.name;
+        const gender = family.gender;
+        const isDeath = family.isDeath;
+        const deaths = family.deaths?.length;
+        const disabilities = family.disabilities?.length;
+        const householdNo = family.households?.household_no;
+        const age  = calculateAge(family.date_of_birth);
+        
 
     if (villageName && isDeath === 'No') {
         if (!villageCounts[villageName]) {
@@ -632,6 +647,7 @@ const Dashboard = () => {
         };
         }
 
+       
         if (gender === 'ကျား') {
         villageCounts[villageName].maleCount++;
         } else if (gender === 'မ') {
@@ -733,6 +749,8 @@ const Dashboard = () => {
     return villageCounts[b].familyCount - villageCounts[a].familyCount;
     });
     // Calculate total gender counts, family count, and household count for each village end
+
+    
 
     //Chart start
     const barChartLabels = sortedVillages;
@@ -1313,7 +1331,7 @@ const Dashboard = () => {
                                         "whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6 lg:pl-8"
                                     )}
                                     >
-                                    {averageAge.toFixed(2)}
+                                    {averageAge.toFixed(0)}
                                     </td>
                                     <td
                                     className={classNames(
