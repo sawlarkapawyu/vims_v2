@@ -815,83 +815,7 @@ const Dashboard = () => {
     
     return (
         <div className='py-4'>
-            <section className="grid gap-6 py-4 md:grid-cols-2 xl:grid-cols-4">
-                <div className="relative flex items-center p-8 bg-white rounded-lg shadow hover:bg-gray-100">
-                    <div className="inline-flex items-center justify-center flex-shrink-0 w-16 h-16 mr-6 text-blue-700 bg-blue-100 rounded-full">
-                        <svg
-                        aria-hidden="true"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                        className="w-6 h-6"
-                        >
-                        <UserGroupIcon className="inline w-6 h-6 mr-2"></UserGroupIcon>
-                        </svg>
-                    </div>
-                    <div>
-                        <span className="block text-2xl font-bold">{totalFamilies}</span>
-                        <span className="block text-sm text-gray-500">{t("dashboard.TotalPopulations")}</span>
-                    </div>
-                    <div className="absolute bottom-0 left-0 w-full h-1 bg-blue-700" />
-                </div>
-                <div className="relative flex items-center p-8 bg-white rounded-lg shadow hover:bg-gray-100">
-                    <div className="inline-flex items-center justify-center flex-shrink-0 w-16 h-16 mr-6 text-blue-900 bg-blue-100 rounded-full">
-                        <svg
-                        aria-hidden="true"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                        className="w-6 h-6"
-                        >
-                        <HomeModernIcon className="inline w-6 h-6 mr-2" />
-                        </svg>
-                    </div>
-                    <div>
-                        <span className="block text-2xl font-bold">{totalHouseholds}</span>
-                        <span className="block text-sm text-gray-500">{t("dashboard.TotalHouseholds")}</span>
-                    </div>
-                    <div className="absolute bottom-0 left-0 w-full h-1 bg-blue-900" />
-                </div>
-                
-                <div className="relative flex items-center p-8 bg-white rounded-lg shadow hover:bg-gray-100">
-                    <div className="inline-flex items-center justify-center flex-shrink-0 w-16 h-16 mr-6 text-blue-400 bg-blue-100 rounded-full">
-                        <svg
-                        aria-hidden="true"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                        className="w-6 h-6"
-                        >
-                        <DocumentDuplicateIcon className="inline w-6 h-6 mr-2" />
-                        </svg>
-                    </div>
-                    <div>
-                        <span className="inline-block text-2xl font-bold">{totalDeaths}</span>
-                        <span className="block text-sm text-gray-500">{t("dashboard.TotalDeaths")}</span>
-                    </div>
-                    <div className="absolute bottom-0 left-0 w-full h-1 bg-blue-400" />
-                </div>
-                <div className="relative flex items-center p-8 bg-white rounded-lg shadow hover:bg-gray-100">
-                    <div className="inline-flex items-center justify-center flex-shrink-0 w-16 h-16 mr-6 text-blue-400 bg-blue-100 rounded-full">
-                        <svg
-                        aria-hidden="true"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                        className="w-6 h-6"
-                        >
-                        <StarIcon className="inline w-6 h-6 mr-2" />
-                        </svg>
-                    </div>
-                    <div>
-                        <span className="inline-block text-2xl font-bold">{totalDisabilities}</span>
-                        <span className="block text-sm text-gray-500">{t("dashboard.TotalDisabilities")}</span>
-                    </div>
-                    <div className="absolute bottom-0 left-0 w-full h-1 bg-blue-400" />
-                </div>
-            </section>
-            
-            {user && (
+            {user ? (
             <section className="grid gap-6 py-4 md:grid-cols-2 xl:grid-cols-5">
                 <div className="relative flex items-center p-8 bg-white rounded-lg shadow hover:bg-gray-100">
                     <div className="inline-flex items-center justify-center flex-shrink-0 w-16 h-16 mr-6 text-blue-700 bg-blue-100 rounded-full">
@@ -983,6 +907,82 @@ const Dashboard = () => {
                         <span className="block text-sm text-gray-500">{t("dashboard.TotalUsers")}</span>
                     </div>
                     <div className="absolute bottom-0 left-0 w-full h-1 bg-blue-200" />
+                </div>
+            </section>
+            ) : (
+                <section className="grid gap-6 py-4 md:grid-cols-2 xl:grid-cols-4">
+                <div className="relative flex items-center p-8 bg-white rounded-lg shadow hover:bg-gray-100">
+                    <div className="inline-flex items-center justify-center flex-shrink-0 w-16 h-16 mr-6 text-blue-700 bg-blue-100 rounded-full">
+                        <svg
+                        aria-hidden="true"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                        className="w-6 h-6"
+                        >
+                        <UserGroupIcon className="inline w-6 h-6 mr-2"></UserGroupIcon>
+                        </svg>
+                    </div>
+                    <div>
+                        <span className="block text-2xl font-bold">{totalFamilies}</span>
+                        <span className="block text-sm text-gray-500">{t("dashboard.TotalPopulations")}</span>
+                    </div>
+                    <div className="absolute bottom-0 left-0 w-full h-1 bg-blue-700" />
+                </div>
+                <div className="relative flex items-center p-8 bg-white rounded-lg shadow hover:bg-gray-100">
+                    <div className="inline-flex items-center justify-center flex-shrink-0 w-16 h-16 mr-6 text-blue-900 bg-blue-100 rounded-full">
+                        <svg
+                        aria-hidden="true"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                        className="w-6 h-6"
+                        >
+                        <HomeModernIcon className="inline w-6 h-6 mr-2" />
+                        </svg>
+                    </div>
+                    <div>
+                        <span className="block text-2xl font-bold">{totalHouseholds}</span>
+                        <span className="block text-sm text-gray-500">{t("dashboard.TotalHouseholds")}</span>
+                    </div>
+                    <div className="absolute bottom-0 left-0 w-full h-1 bg-blue-900" />
+                </div>
+                
+                <div className="relative flex items-center p-8 bg-white rounded-lg shadow hover:bg-gray-100">
+                    <div className="inline-flex items-center justify-center flex-shrink-0 w-16 h-16 mr-6 text-blue-400 bg-blue-100 rounded-full">
+                        <svg
+                        aria-hidden="true"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                        className="w-6 h-6"
+                        >
+                        <DocumentDuplicateIcon className="inline w-6 h-6 mr-2" />
+                        </svg>
+                    </div>
+                    <div>
+                        <span className="inline-block text-2xl font-bold">{totalDeaths}</span>
+                        <span className="block text-sm text-gray-500">{t("dashboard.TotalDeaths")}</span>
+                    </div>
+                    <div className="absolute bottom-0 left-0 w-full h-1 bg-blue-400" />
+                </div>
+                <div className="relative flex items-center p-8 bg-white rounded-lg shadow hover:bg-gray-100">
+                    <div className="inline-flex items-center justify-center flex-shrink-0 w-16 h-16 mr-6 text-blue-400 bg-blue-100 rounded-full">
+                        <svg
+                        aria-hidden="true"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                        className="w-6 h-6"
+                        >
+                        <StarIcon className="inline w-6 h-6 mr-2" />
+                        </svg>
+                    </div>
+                    <div>
+                        <span className="inline-block text-2xl font-bold">{totalDisabilities}</span>
+                        <span className="block text-sm text-gray-500">{t("dashboard.TotalDisabilities")}</span>
+                    </div>
+                    <div className="absolute bottom-0 left-0 w-full h-1 bg-blue-400" />
                 </div>
             </section>
             )}
