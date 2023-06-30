@@ -377,6 +377,11 @@ const Report = () => {
         (family.gender && family?.gender.toLowerCase().includes(searchQuery.toLowerCase())) ||
         (family.father_name && family?.father_name.toLowerCase().includes(searchQuery.toLowerCase())) ||
         (family.mother_name && family?.mother_name.toLowerCase().includes(searchQuery.toLowerCase())) ||
+        (family.households.villages.name.toLowerCase().includes(searchQuery.toLowerCase())) ||
+        (family.households.townships.name.toLowerCase().includes(searchQuery.toLowerCase())) ||
+        (family.households.ward_village_tracts.name.toLowerCase().includes(searchQuery.toLowerCase())) ||
+        (family.households.districts.name.toLowerCase().includes(searchQuery.toLowerCase())) ||
+        (family.households.state_regions.name.toLowerCase().includes(searchQuery.toLowerCase())) ||
         (family.remark && family?.remark.toLowerCase().includes(searchQuery.toLowerCase()));
         
         const isMatchingDeath =

@@ -471,17 +471,22 @@ const Dashboard = () => {
     // Filtered faimiles based on search and filters
     const filterFamilies = families.filter((family) => {
         const isMatchingSearchQuery =
-        family.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        // family.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         family.gender.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        family.father_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        family.mother_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        family.remark.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        family.date_of_birth.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        family.nrc_id.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        // family.father_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        // family.mother_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        // family.remark.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        // family.date_of_birth.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        // family.nrc_id.toLowerCase().includes(searchQuery.toLowerCase()) ||
 
         family.occupations.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         family.ethnicities.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         family.households.household_no.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        family.households.villages.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        family.households.townships.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        family.households.ward_village_tracts.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        family.households.districts.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        family.households.state_regions.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         family.religions.name.toLowerCase().includes(searchQuery.toLowerCase());
 
         const isMatchingDeath =
