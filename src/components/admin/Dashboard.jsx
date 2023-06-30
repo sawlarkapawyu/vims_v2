@@ -1,6 +1,6 @@
 import { GridFilterListIcon } from '@mui/x-data-grid';
 import React, { useState, useEffect } from "react";
-import { useSupabaseClient } from '@supabase/auth-helpers-react'
+import { useUser, useSupabaseClient } from '@supabase/auth-helpers-react'
 // import { supabase } from "/src/components/utilities/supabase";
 import { UserGroupIcon, HomeModernIcon, DocumentDuplicateIcon, StarIcon, BookOpenIcon, ArrowDownIcon, DocumentArrowDownIcon } from '@heroicons/react/24/outline';
 import DropdownSelect from 'react-dropdown-select';
@@ -21,7 +21,8 @@ const Dashboard = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [errorMessage, setErrorMessage] = useState("");
     const { t } = useTranslation("");
-    
+    const user = useUser()
+
     const [families, setFamilies] = useState([]);
     const [searchQuery, setSearchQuery] = useState('');
 
@@ -751,6 +752,45 @@ const Dashboard = () => {
     // Calculate total gender counts, family count, and household count for each village end
 
     
+    // Generate CSV data
+    const csvExportData = sortedVillages.map((villageName, index) => {
+    const village = villageCounts[villageName];
+    const maleCount = village.maleCount;
+    const femaleCount = village.femaleCount;
+    const totalPopulations = village.totalMembers;
+    const averageAge = village.totalMembers !== 0 ? village.totalAge / village.totalMembers : 0;
+    const totalHouseholds = village.householdCount;
+    const totalDeaths = village.deathCount;
+    const totalDisabilities = village.disabilityCount;
+    
+        return {
+        No: (index + 1).toString(),
+        'Village Name': villageName,
+        Male: maleCount,
+        Female: femaleCount,
+        'Total Populations': totalPopulations,
+        'Average Age': averageAge,
+        'Total Households': totalHouseholds,
+        'Total Deaths': totalDeaths,
+        'Total Disabilities': totalDisabilities,
+        };
+    });
+    // Convert data to CSV format
+    // const csvContent = "data:text/csv;charset=utf-8," + encodeURI(
+    //     [
+    //     Object.keys(csvExportData[0]).join(','),
+    //     ...csvExportData.map(item => Object.values(item).join(','))
+    //     ].join('\n')
+    // );
+    
+    // Create a download link
+    // const link = document.createElement('a');
+    // link.setAttribute('href', csvContent);
+    // link.setAttribute('download', 'village_data.csv');
+    // document.body.appendChild(link);
+    // link.click();
+    // document.body.removeChild(link);
+    // Generate CSV data End
 
     //Chart start
     const barChartLabels = sortedVillages;
@@ -775,6 +815,83 @@ const Dashboard = () => {
     
     return (
         <div className='py-4'>
+            <section className="grid gap-6 py-4 md:grid-cols-2 xl:grid-cols-4">
+                <div className="relative flex items-center p-8 bg-white rounded-lg shadow hover:bg-gray-100">
+                    <div className="inline-flex items-center justify-center flex-shrink-0 w-16 h-16 mr-6 text-blue-700 bg-blue-100 rounded-full">
+                        <svg
+                        aria-hidden="true"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                        className="w-6 h-6"
+                        >
+                        <UserGroupIcon className="inline w-6 h-6 mr-2"></UserGroupIcon>
+                        </svg>
+                    </div>
+                    <div>
+                        <span className="block text-2xl font-bold">{totalFamilies}</span>
+                        <span className="block text-sm text-gray-500">{t("dashboard.TotalPopulations")}</span>
+                    </div>
+                    <div className="absolute bottom-0 left-0 w-full h-1 bg-blue-700" />
+                </div>
+                <div className="relative flex items-center p-8 bg-white rounded-lg shadow hover:bg-gray-100">
+                    <div className="inline-flex items-center justify-center flex-shrink-0 w-16 h-16 mr-6 text-blue-900 bg-blue-100 rounded-full">
+                        <svg
+                        aria-hidden="true"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                        className="w-6 h-6"
+                        >
+                        <HomeModernIcon className="inline w-6 h-6 mr-2" />
+                        </svg>
+                    </div>
+                    <div>
+                        <span className="block text-2xl font-bold">{totalHouseholds}</span>
+                        <span className="block text-sm text-gray-500">{t("dashboard.TotalHouseholds")}</span>
+                    </div>
+                    <div className="absolute bottom-0 left-0 w-full h-1 bg-blue-900" />
+                </div>
+                
+                <div className="relative flex items-center p-8 bg-white rounded-lg shadow hover:bg-gray-100">
+                    <div className="inline-flex items-center justify-center flex-shrink-0 w-16 h-16 mr-6 text-blue-400 bg-blue-100 rounded-full">
+                        <svg
+                        aria-hidden="true"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                        className="w-6 h-6"
+                        >
+                        <DocumentDuplicateIcon className="inline w-6 h-6 mr-2" />
+                        </svg>
+                    </div>
+                    <div>
+                        <span className="inline-block text-2xl font-bold">{totalDeaths}</span>
+                        <span className="block text-sm text-gray-500">{t("dashboard.TotalDeaths")}</span>
+                    </div>
+                    <div className="absolute bottom-0 left-0 w-full h-1 bg-blue-400" />
+                </div>
+                <div className="relative flex items-center p-8 bg-white rounded-lg shadow hover:bg-gray-100">
+                    <div className="inline-flex items-center justify-center flex-shrink-0 w-16 h-16 mr-6 text-blue-400 bg-blue-100 rounded-full">
+                        <svg
+                        aria-hidden="true"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                        className="w-6 h-6"
+                        >
+                        <StarIcon className="inline w-6 h-6 mr-2" />
+                        </svg>
+                    </div>
+                    <div>
+                        <span className="inline-block text-2xl font-bold">{totalDisabilities}</span>
+                        <span className="block text-sm text-gray-500">{t("dashboard.TotalDisabilities")}</span>
+                    </div>
+                    <div className="absolute bottom-0 left-0 w-full h-1 bg-blue-400" />
+                </div>
+            </section>
+            
+            {user && (
             <section className="grid gap-6 py-4 md:grid-cols-2 xl:grid-cols-5">
                 <div className="relative flex items-center p-8 bg-white rounded-lg shadow hover:bg-gray-100">
                     <div className="inline-flex items-center justify-center flex-shrink-0 w-16 h-16 mr-6 text-blue-700 bg-blue-100 rounded-full">
@@ -868,6 +985,7 @@ const Dashboard = () => {
                     <div className="absolute bottom-0 left-0 w-full h-1 bg-blue-200" />
                 </div>
             </section>
+            )}
 
           
             {/* Chart */}
@@ -876,14 +994,14 @@ const Dashboard = () => {
                     <div className="absolute top-4 right-4">
                         <button className="flex px-2 py-1 mr-1 text-sm text-white bg-gray-400 rounded-md">
                         <DocumentArrowDownIcon className="w-5 h-5 mr-2" />
-                        {/* <CSVLink
-                            data={csvData}
+                        <CSVLink
+                            data={csvExportData}
                             filename={`village_data_${filterFamilies.length}.csv`}
                             className="text-white"
                         >
-                            Export to CSV
-                        </CSVLink> */}
-                        Export to CSV
+                            Download Dataset
+                        </CSVLink>
+                        {/* Export to CSV */}
                         </button>
                     </div>
                     <Bar

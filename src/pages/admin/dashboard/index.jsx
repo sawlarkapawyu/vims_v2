@@ -12,11 +12,11 @@ export default function Dashboard() {
     const router = useRouter();
     const session = useSession()
 
-    useEffect(() => {
-        if (!session) {
-          router.push('/login');
-        }
-    }, [session, router]);
+    // useEffect(() => {
+    //     if (!session) {
+    //       router.push('/login');
+    //     }
+    // }, [session, router]);
 
     // useUserRoleCheckIsVillager();
     

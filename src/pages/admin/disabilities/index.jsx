@@ -88,19 +88,35 @@ export default function Disability() {
         );
     });
 
+    const checkAge = (dateOfBirth) => {
+        const today = new Date();
+        const birthDate = new Date(dateOfBirth);
+        const yearDiff = today.getFullYear() - birthDate.getFullYear();
+        const monthDiff = today.getMonth() - birthDate.getMonth();
+        const dayDiff = today.getDate() - birthDate.getDate();
+
+        const age = yearDiff + (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0) ? -1 : 0 );
+        
+        return age;
+    };    
+
     //CSV Export Start
     useEffect(() => {
         const formattedData = filteredDisabilities.map((disability) => {
             const typeOfDisability = disability.type_of_disabilities?.name;
             const familyName = disability.families?.name;
             const familyGender = disability.families?.gender;
-            const familyDob = disability.families?.date_of_birth;
+            const familyDob = formatDate(disability.families?.date_of_birth);
             // const householdNo = disability.families?.households?.household_no;
             const villageName = disability.families?.households?.villages?.name;
             const wardVillageTractName = disability.families?.households?.ward_village_tracts?.name;
             const townshipName = disability.families?.households?.townships?.name;
             const districtName = disability.families?.households?.districts?.name;
             const stateRegionName = disability.families?.households?.state_regions?.name;
+
+            const age = checkAge(disability.families?.date_of_birth)
+            ? Math.floor((new Date() - new Date(disability.families?.date_of_birth)) / (365.25 * 24 * 60 * 60 * 1000))
+            : '';
 
             return {
                 id: disability.id.toString(),
@@ -109,6 +125,7 @@ export default function Disability() {
                 type_of_disabilities: typeOfDisability ? typeOfDisability : '',
                 gender: familyGender ? familyGender : '',
                 dob: familyDob ? familyDob : '',
+                age: age,
                 // householdNo: householdNo ? householdNo : '',
                 village: villageName ? villageName : '',
                 ward_village_tract: wardVillageTractName ? wardVillageTractName : '',
