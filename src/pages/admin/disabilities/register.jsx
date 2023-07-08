@@ -364,7 +364,7 @@ export default function DisibilitySearch() {
     };
     // Pagination End
 
-    //Disability
+    //Type of Disability
     const [type_disabilities, setTypeDisabilities] = useState([]);
     const [selectedDisability, setSelectedDisability] = useState('');
     const [newDisability, setNewDisability] = useState('');
@@ -787,6 +787,7 @@ export default function DisibilitySearch() {
                                             <p><span className="font-semibold">{t("NRC")}:</span> {selectedFamily.nrc_id}</p>
                                             <p><span className="font-semibold">{t("Address")}:</span> {`${selectedFamily.households.villages.name}\n${selectedFamily.households.ward_village_tracts.name}\n${selectedFamily.households.townships.name}, ${selectedFamily.households.districts.name},${selectedFamily.households.state_regions.name}`}</p>
                                         </div>
+                                        
                                         {/* Type */}
                                         <div className="sm:col-span-4">
                                             <label htmlFor="" className="block text-sm font-medium leading-6 text-gray-900">

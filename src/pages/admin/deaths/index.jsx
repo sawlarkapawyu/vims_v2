@@ -39,10 +39,24 @@ export default function Deaths() {
             id,
             death_date,
             death_place,
+            type_of_deaths (name),
             complainant,
             remark,
             family_id,
-            families (name, date_of_birth, nrc_id, gender, households (household_no, state_regions(name), townships(name), districts(name), ward_village_tracts(name), villages(name)))
+            families (
+                name,
+                date_of_birth,
+                nrc_id,
+                gender,
+                households (
+                  household_no,
+                  state_regions(name),
+                  townships(name),
+                  districts(name),
+                  ward_village_tracts(name),
+                  villages(name)
+                )
+            )
           `)
           .order("inserted_at", { ascending: false });
         
@@ -63,14 +77,15 @@ export default function Deaths() {
     const [searchQuery, setSearchQuery] = useState('');
     const filteredDeaths = deaths.filter((death) => {
         const isMatchingSearchQuery =
-          (death.death_date && death.death_date.toLowerCase().includes(searchQuery.toLowerCase())) ||
-          (death.death_place && death.death_place.toLowerCase().includes(searchQuery.toLowerCase())) ||
-          (death.complainant && death.complainant.toLowerCase().includes(searchQuery.toLowerCase())) ||
-          (death.remark && death.remark.toLowerCase().includes(searchQuery.toLowerCase())) ||
-          (death.families.name && death.families.name.toLowerCase().includes(searchQuery.toLowerCase())) ||
-          (death.families.date_of_birth && formatDate(death.families.date_of_birth).startsWith(searchQuery)) ||
-          (death.families.nrc_id && death.families.nrc_id.toLowerCase().includes(searchQuery.toLowerCase())) ||
-          (death.families.gender && death.families.gender.toLowerCase().includes(searchQuery.toLowerCase()));
+            (death.death_date && death.death_date.toLowerCase().includes(searchQuery.toLowerCase())) ||
+            (death.death_place && death.death_place.toLowerCase().includes(searchQuery.toLowerCase())) ||
+            (death.type_of_deaths.name && death.type_of_deaths.name.toLowerCase().includes(searchQuery.toLowerCase())) ||
+            (death.complainant && death.complainant.toLowerCase().includes(searchQuery.toLowerCase())) ||
+            (death.remark && death.remark.toLowerCase().includes(searchQuery.toLowerCase())) ||
+            (death.families.name && death.families.name.toLowerCase().includes(searchQuery.toLowerCase())) ||
+            (death.families.date_of_birth && formatDate(death.families.date_of_birth).startsWith(searchQuery)) ||
+            (death.families.nrc_id && death.families.nrc_id.toLowerCase().includes(searchQuery.toLowerCase())) ||
+            (death.families.gender && death.families.gender.toLowerCase().includes(searchQuery.toLowerCase()));
       
         return isMatchingSearchQuery;
     });
@@ -78,6 +93,7 @@ export default function Deaths() {
     // CSV Export Start
     useEffect(() => {
         const formattedData = filteredDeaths.map((death) => {
+            const typeOfDeath = death.type_of_deaths?.name;
             const familyName = death.families?.name;
             const familyGender = death.families?.gender;
             const familyDob = death.families?.date_of_birth;
@@ -92,6 +108,7 @@ export default function Deaths() {
             name: familyName || '',
             death_date: death.death_date,
             death_place: death.death_place,
+            type_of_deaths: typeOfDeath ? typeOfDeath : '',
             complainant: death.complainant,
             remark: death.remark,
             gender: familyGender || '',
@@ -354,6 +371,12 @@ export default function Deaths() {
                                             scope="col"
                                             className="sticky top-0 z-10 border-b border-gray-300 bg-white bg-opacity-75 py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 backdrop-blur backdrop-filter sm:pl-6 lg:pl-8"
                                         >
+                                             {t("TypeOfDeath")}
+                                        </th>
+                                        <th
+                                            scope="col"
+                                            className="sticky top-0 z-10 border-b border-gray-300 bg-white bg-opacity-75 py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 backdrop-blur backdrop-filter sm:pl-6 lg:pl-8"
+                                        >
                                             {t("Complainant")}
                                         </th>
                                         <th
@@ -466,6 +489,14 @@ export default function Deaths() {
                                             >
                                             {death.death_place}
                                             </td>
+                                            <td
+                                                className={classNames(
+                                                    deathIdx !== deaths.length - 1 ? 'border-b border-gray-200' : '',
+                                                    'whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6 lg:pl-8'
+                                                )}
+                                                >
+                                                {death.type_of_deaths?.name}
+                                                </td>
                                             <td
                                             className={classNames(
                                                 deathIdx !== deaths.length - 1 ? 'border-b border-gray-200' : '',

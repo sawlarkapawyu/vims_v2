@@ -259,6 +259,7 @@ export default function DisabilityEdit() {
                         </div>
                          )}
                         <div className="grid grid-cols-1 px-3 py-3 border-t md:grid-cols-2"> {/* Updated className */}
+                            
                             {/* Type */}
                             <div className="col-span-1 px-3 py-3 mt-3 md:col-span-1">
                                 <label htmlFor="" className="block text-sm font-medium leading-6 text-gray-900">

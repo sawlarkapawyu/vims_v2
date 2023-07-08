@@ -31,6 +31,8 @@ export default function DeathEdit() {
     const { t } = useTranslation("");
     
     const [deaths, setDeaths] = useState(null);
+    const [typeDeaths, setTypeDeaths] = useState([]);
+    const [selectedDeathType, setSelectedDeathType] = useState('');   
     const [deathDate, setDeathDate] = useState('');
     const [deathPlace, setDeathPlace] = useState('');
     const [complainant, setComplainant] = useState('');
@@ -39,12 +41,15 @@ export default function DeathEdit() {
     useUserRoleCheck();
     
     useEffect(() => {
+        fetchDeathType();
+
         const fetchDeathData = async () => {
             const { data: deathData, error: deathError } = await supabase
                 .from('deaths')
                 .select(`
                 death_date,
                 death_place,
+                type,
                 complainant,
                 remark,
                 families (name, date_of_birth, nrc_id, gender, households (household_no, state_regions(name), townships(name), districts(name), ward_village_tracts(name), villages(name)))
@@ -55,11 +60,15 @@ export default function DeathEdit() {
             if (deathError) {
                 throw deathError;
             }
-            setDeathDate(deathData.death_date);
-            setDeathPlace(deathData.death_place);
-            setComplainant(deathData.complainant);
-            setRemark(deathData.remark);
-            setDeaths(deathData);
+
+            if (deathData) {
+                setSelectedDeathType(deathData.type);
+                setDeathDate(deathData.death_date);
+                setDeathPlace(deathData.death_place);
+                setComplainant(deathData.complainant);
+                setRemark(deathData.remark);
+                setDeaths(deathData);
+            }
             };
 
         if (id) {
@@ -77,6 +86,7 @@ export default function DeathEdit() {
             const { data: deathData, error: deathError } = await supabase
                 .from('deaths')
                 .update({
+                    type: selectedDeathType,
                     death_date: deathDate,
                     death_place: deathPlace,
                     complainant: complainant,
@@ -96,6 +106,64 @@ export default function DeathEdit() {
         }
     };
 
+    // Add New Death Type
+    const [newDeath, setNewDeath] = useState('');
+    const [showModalDeath, setShowModalDeath] = useState(false);
+    
+    const handleCloseModalDeath = () => {
+        setShowModalDeath(false);
+        setNewDeath('');
+    };
+
+    const fetchDeathType = async () => {
+        try {
+          const { data, error } = await supabase.from('type_of_deaths').select('id, name');
+      
+          if (error) {
+            throw new Error(error.message);
+          } else {
+            setTypeDeaths(data || []);
+          }
+        } catch (error) {
+          console.error('Error fetching deaths:', error);
+        }
+    };  
+    
+    const handleDeathChange = (e) => {
+        setSelectedDeathType(e.target.value);
+        if (e.target.value === "new") {
+            setShowModalDeath(true);
+        }
+    };
+
+    const handleNewDeathChange = (e) => {
+        setNewDeath(e.target.value);
+    };
+
+    const handleNewDeathSubmit = async () => {
+        if (newDeath) {
+          const { data, error } = await supabase.from('type_of_deaths').insert({ name: newDeath });
+      
+          fetchDeathType();
+      
+          // Close the modal box
+          setShowModalDeath(false);
+      
+          if (error) {
+            console.log(error);
+          } else {
+            if (data) {
+                setTypeDeaths([...deaths, data[0]]);
+                setSelectedDeathType(data[0].id);
+            }
+            setNewDeath('');
+            setShowModalDeath(false);
+          }
+        }
+    };
+    // End
+
+
     const handleBackClick = () => {
         router.push('/admin/deaths');
     };
@@ -108,6 +176,7 @@ export default function DeathEdit() {
                 death_date,
                 death_place,
                 complainant,
+                type,
                 remark,
                 families (name, date_of_birth, nrc_id, gender, households (household_no, state_regions(name), townships(name), districts(name), ward_village_tracts(name), villages(name)))
                 `)
@@ -117,6 +186,7 @@ export default function DeathEdit() {
             if (deathError) {
                 throw deathError;
             }
+            setSelectedDeathType([deathData.type]);
             setDeathDate(deathData.death_date);
             setDeathPlace(deathData.death_place);
             setComplainant(deathData.complainant);
@@ -230,6 +300,77 @@ export default function DeathEdit() {
                                     />
                                 </div>
                             </div>
+
+                            {/* Type */}
+                            <div className="col-span-1 px-3 py-3 mt-3 md:col-span-1">
+                                <label htmlFor="" className="block text-sm font-medium leading-6 text-gray-900">
+                                {t("TypeOfDeath")}
+                                </label>
+                                <div className="relative mt-2">
+                                    <select
+                                        id="death"
+                                        value={selectedDeathType}
+                                        onChange={handleDeathChange}
+                                        className="block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-sky-600 sm:text-sm sm:leading-6"
+                                    >
+                                        <option value="">{t("other.Choose")}</option>
+                                        {typeDeaths && typeDeaths.map((death, index) => (
+                                            <option key={index} value={death.id}>
+                                            {death.name}
+                                            </option>
+                                        ))}
+                                        <option disabled>──────────</option>
+                                        <option value="new" className="font-medium text-blue-500">
+                                            {t("other.Add")}
+                                        </option>
+                                    </select>
+                                </div>
+                                {showModalDeath && (
+                                    <div className="fixed inset-0 z-10 overflow-y-auto">
+                                        <div className="flex items-end justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
+                                            <div className="fixed inset-0 transition-opacity" aria-hidden="true">
+                                                <div className="absolute inset-0 bg-gray-300 opacity-75"></div>
+                                            </div>
+                                            <span className="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+                                            <div className="inline-block px-4 pt-5 pb-4 overflow-hidden text-left align-bottom transition-all transform bg-white rounded-lg shadow-xl sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6">
+                                            <div>
+                                                <div className="mt-3 text-center sm:mt-5">
+                                                    <h3 className="text-lg font-medium leading-6 text-gray-900">{t("other.Add")} - {t("TypeOfDeath")}</h3>
+                                                    <div className="mt-2">
+                                                        <input
+                                                        type="text"
+                                                        name="newDeath"
+                                                        id="newDeath"
+                                                        value={newDeath}
+                                                        onChange={handleNewDeathChange}
+                                                        className="block w-full px-3 py-2 mt-2 mb-2 border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                                                        />
+                                                    </div>
+                                                </div>
+                                                <div className="flex justify-between mt-5 sm:mt-6">
+                                                    <button
+                                                        type="button"
+                                                        className="inline-block w-full py-2 text-base font-medium text-white border border-transparent rounded-md shadow-sm bg-sky-600 hover:bg-sky-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sky-500 sm:text-sm disabled:opacity-50"
+                                                        disabled={!selectedDeathType && !newDeath}
+                                                        onClick={handleNewDeathSubmit}
+                                                    >
+                                                        {t("other.Submit")}
+                                                    </button>
+                                                    <button
+                                                        type="button"
+                                                        className="inline-block w-full px-4 py-2 ml-2 text-base font-medium text-gray-700 bg-gray-200 border border-transparent rounded-md shadow-sm hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 sm:text-sm"
+                                                        onClick={handleCloseModalDeath}
+                                                    >
+                                                        {t("other.Cancel")}
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                )}
+                            </div>
+                            
                             <div className="col-span-1 px-3 py-3 mt-3 md:col-span-1">
                                 <label htmlFor="complainant" className="block text-sm font-medium leading-6 text-gray-900">
                                     {t("Complainant")}
