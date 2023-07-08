@@ -80,11 +80,13 @@
         "Gender": "လိင်",
         "IsDisabilities": "မသန်စွမ်း",
         "IsDeath": "သေဆုံးမှု",
-        "MinAge": "အသက် <",
-        "MaxAge": "အသက် >",
+        "MinAge": "အသက် <=",
+        "MaxAge": "အသက် >=",
         "resident": "နေထိုင်မှုစာရင်း",
         "Search": "ရှာရန်",
-        "TotalResults": "စုစုပေါင်းရလဒ်"
+        "TotalResults": "စုစုပေါင်းရလဒ်",
+        "DisabilityType": "မသန်စွမ်း အမျိုးအစားများ",
+        "DeathType": "သေဆုံးမှု အမျိုးအစားများ"
     },
     "other": {
         "Admin": "စီမံခန့်ခွဲသူ",

@@ -14,6 +14,7 @@ import { useRouter } from 'next/router';
 import { formatDate, classNames } from '/src/components/utilities/tools.js';
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { useTranslation } from "next-i18next";
+import { GridFilterListIcon } from '@mui/x-data-grid';
 
 export default function Disability() {
     const router = useRouter();
@@ -26,10 +27,19 @@ export default function Disability() {
     const [disabilities, setDisabilities] = useState([]);
     const [csvData, setCSVData] = useState([]);
 
+    const [types, setTypes] = useState([]);
+    const [selectedType, setSelectedType] = useState('');
+    const [genders, setGenders] = useState([]);
+    const [selectedGender, setSelectedGender] = useState('');
+    const [minAge, setMinAge] = useState('');
+    const [maxAge, setMaxAge] = useState('');
+
     useUserRoleCheck();
 
     useEffect(() => {
         fetchDisabilities();
+        fetchDeathType();
+        fetchGenders();
     }, []);
     
     const fetchDisabilities = async () => {
@@ -72,6 +82,70 @@ export default function Disability() {
         router.push('/admin/disabilities/register');
     };
 
+    // Function to check if the age matches the selected age filter
+    const checkAge = (dateOfBirth) => {
+        const today = new Date();
+        const birthDate = new Date(dateOfBirth);
+        const age = today.getFullYear() - birthDate.getFullYear();
+        const monthDiff = today.getMonth() - birthDate.getMonth();
+        const dayDiff = today.getDate() - birthDate.getDate();
+        const isMatchingAge =
+          (minAge === '' || (age >= minAge) || (age === minAge && (monthDiff > 0 || (monthDiff === 0 && dayDiff >= 0)))) &&
+          (maxAge === '' || (age <= maxAge) || (age === maxAge && (monthDiff < 0 || (monthDiff === 0 && dayDiff <= 0))));
+        
+        return isMatchingAge;
+    };  
+
+    const [showFilter, setShowFilter] = useState(false);
+
+    const handleToggleFilter = () => {
+        setShowFilter(!showFilter);
+    };
+
+    async function fetchDeathType() {
+        try {
+          const { data, error } = await supabase.from('type_of_disabilities').select('id, name');
+          if (error) {
+            throw new Error(error.message);
+          }
+          setTypes(data);
+        } catch (error) {
+          console.log('Error fetching death types:', error.message);
+        }
+    }
+
+    async function fetchGenders() {
+        try {
+          const { data, error } = await supabase
+            .from('families')
+            .select('gender');
+        
+          if (error) {
+            throw new Error(error.message);
+          }
+      
+          const uniqueGenders = [];
+          data.forEach(row => {
+            if (!uniqueGenders.includes(row.gender)) {
+              uniqueGenders.push(row.gender);
+            }
+          });
+      
+          setGenders(uniqueGenders);
+        } catch (error) {
+          console.log('Error fetching gender:', error.message);
+        }
+    }
+    
+    const handleMinAgeChange = (e) => {
+        const inputMinAge = e.target.value !== '' ? parseInt(e.target.value) : '';
+        setMinAge(inputMinAge);
+    };
+    const handleMaxAgeChange = (e) => {
+        const inputMaxAge = e.target.value !== '' ? parseInt(e.target.value) : '';
+        setMaxAge(inputMaxAge);
+    };
+
     // Search and filter state
     const [searchQuery, setSearchQuery] = useState('');
     const filteredDisabilities = disabilities.filter((disability) => {
@@ -83,22 +157,32 @@ export default function Disability() {
         (disability.families.nrc_id && disability.families.nrc_id.toLowerCase().includes(searchQuery.toLowerCase())) ||
         (disability.families.gender && disability.families.gender.toLowerCase().includes(searchQuery.toLowerCase()));
 
+        const isMatchingDisabilityType =
+            selectedType === '' || disability.type_of_disabilities.name === selectedType;
+        const isMatchingGender =
+            selectedGender === '' || disability.families.gender === selectedGender;
+    
+        const isMatchingAge = checkAge(disability.families.date_of_birth);
+
         return (
-        isMatchingSearchQuery
+            isMatchingDisabilityType &&
+            isMatchingSearchQuery &&
+            isMatchingGender &&
+            isMatchingAge
         );
     });
 
-    const checkAge = (dateOfBirth) => {
-        const today = new Date();
-        const birthDate = new Date(dateOfBirth);
-        const yearDiff = today.getFullYear() - birthDate.getFullYear();
-        const monthDiff = today.getMonth() - birthDate.getMonth();
-        const dayDiff = today.getDate() - birthDate.getDate();
+    // const checkAgeCSV = (dateOfBirth) => {
+    //     const today = new Date();
+    //     const birthDate = new Date(dateOfBirth);
+    //     const yearDiff = today.getFullYear() - birthDate.getFullYear();
+    //     const monthDiff = today.getMonth() - birthDate.getMonth();
+    //     const dayDiff = today.getDate() - birthDate.getDate();
 
-        const age = yearDiff + (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0) ? -1 : 0 );
+    //     const age = yearDiff + (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0) ? -1 : 0 );
         
-        return age;
-    };    
+    //     return age;
+    // };    
 
     //CSV Export Start
     useEffect(() => {
@@ -289,33 +373,81 @@ export default function Disability() {
                             </button>
                         </div>
                     </div>
-                    <div className="sm:flex sm:items-center">
-                        <div className="sm:flex-auto">
-                            <div className="relative flex items-center mt-2">
-                                <input
-                                type="text"
-                                name="search"
-                                id="search"
-                                placeholder= {t("filter.Search")}
-                                value={searchQuery}
-                                onChange={(e) => setSearchQuery(e.target.value)}
-                                className="block w-full rounded-md border-0 py-1.5 pr-14 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-sky-600 sm:text-sm sm:leading-6"
-                                />
-                                <div className="absolute inset-y-0 right-0 flex py-1.5 pr-1.5">
-                                    <kbd className="inline-flex items-center px-1 font-sans text-xs text-gray-400 border border-gray-200 rounded">
-                                        ⌘K
-                                    </kbd>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="mt-4 sm:ml-16 sm:mt-0 sm:flex-none">
-                            <p className="text-right text-gray-500">
-                                {t("filter.TotalResults")}: {filteredDisabilities.length}
-                            </p>
-                        </div>
-                    </div>
                     
                     <div className="flow-root mt-8">
+
+                        <div className="flex items-center justify-between mb-4">
+                            <div className="flex items-center">
+                                <input
+                                    type="text"
+                                    value={searchQuery}
+                                    onChange={(e) => setSearchQuery(e.target.value)}
+                                    className="p-2 mr-2 border border-gray-300 rounded-md"
+                                    placeholder={t("filter.Search")}
+                                />
+                                <button
+                                    onClick={handleToggleFilter}
+                                    className="px-4 py-2 text-white rounded-md bg-sky-600 hover:bg-sky-700"
+                                >
+                                <GridFilterListIcon className="w-5 h-5 mr-2"></GridFilterListIcon>
+                                    Filter
+                                </button>
+                            </div>
+                            <p className="text-gray-500">{t("filter.TotalResults")}: {filteredDisabilities.length}</p>
+                        </div>
+
+                        {showFilter && (
+                        <div className="py-4 sm:grid sm:grid-cols-4 sm:gap-4">
+                            <div>
+                                <select 
+                                value={selectedType}
+                                onChange={(e) => setSelectedType(e.target.value)}
+                                className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-sky-600 sm:text-sm sm:leading-6">
+                                    <option value="">{t("filter.DisabilityType")}</option>
+                                    {/* Render Disabiltiy Type options */}
+                                    {types.map((type) => (
+                                        <option key={type.id} value={type.name}>
+                                        {type.name}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+                            <div>
+                                <select
+                                    value={selectedGender}
+                                    onChange={(e) => setSelectedGender(e.target.value)}
+                                    className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-sky-600 sm:text-sm sm:leading-6"
+                                >
+                                    <option value="">{t("filter.Gender")}</option>
+                                    {genders.map((gender) => (
+                                    <option key={gender} value={gender}>
+                                        {gender}
+                                    </option>
+                                    ))}
+                                </select>
+                            </div>
+                            <div>
+                                <input
+                                type="number"
+                                value={minAge}
+                                onChange={handleMinAgeChange}
+                                className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-sky-600 sm:text-sm sm:leading-6"
+                                placeholder={t("filter.MinAge")}
+                                />
+                            </div>
+                            <div>
+                                <input
+                                type="number"
+                                value={maxAge}
+                                onChange={handleMaxAgeChange}
+                                className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-sky-600 sm:text-sm sm:leading-6"
+                                placeholder={t("filter.MaxAge")}
+                                />
+                            </div>
+                        </div>
+                    
+                        )}
+
                         <div className="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
                             <div className="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
                                 
@@ -456,7 +588,7 @@ export default function Disability() {
                                             'whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6 lg:pl-8'
                                         )}
                                         >
-                                        {disability.families.nrc_id}
+                                        {disability.families.nrc_id || 'NA'}
                                         </td>
                                         
                                         <td
@@ -465,7 +597,7 @@ export default function Disability() {
                                             'whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6 lg:pl-8'
                                         )}
                                         >
-                                        {disability.type_of_disabilities.name}
+                                        {disability.type_of_disabilities.name }
                                         </td>
                                         <td
                                         className={classNames(
@@ -473,7 +605,7 @@ export default function Disability() {
                                             'whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6 lg:pl-8'
                                         )}
                                         >
-                                        {disability.description}
+                                        {disability.description || 'NA'}
                                         </td>
                                         <td
                                         className={classNames(

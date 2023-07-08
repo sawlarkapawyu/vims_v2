@@ -80,11 +80,13 @@
     "Gender": "All Gender",
     "IsDisabilities": "All Disabilities",
     "IsDeath": "All Deaths",
-    "MinAge": "Min Age",
-    "MaxAge": "Max Age",
+    "MinAge": "Min Age <=",
+    "MaxAge": "Max Age >=",
     "resident": "Select Resident",
     "Search": "Search",
-    "TotalResults": "Total Results"
+    "TotalResults": "Total Results",
+    "DisabilityType": "Type of Disabilities",
+    "DeathType": "Type of Deaths"
   },
   "other": {
     "Admin": "Admin",

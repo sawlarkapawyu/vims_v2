@@ -13,6 +13,7 @@ import { CSVLink } from "react-csv";
 
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { useTranslation } from "next-i18next";
+import { GridFilterListIcon } from '@mui/x-data-grid';
 
 export default function Deaths() {
     const router = useRouter();
@@ -24,10 +25,19 @@ export default function Deaths() {
     const [deaths, setDeaths] = useState([]);
     const [csvData, setCSVData] = useState([]);
     
+    const [types, setTypes] = useState([]);
+    const [selectedType, setSelectedType] = useState('');
+    const [genders, setGenders] = useState([]);
+    const [selectedGender, setSelectedGender] = useState('');
+    const [minAge, setMinAge] = useState('');
+    const [maxAge, setMaxAge] = useState('');
+
     useUserRoleCheck();
     
     useEffect(() => {
         fetchDeaths();
+        fetchDeathType();
+        fetchGenders();
     }, []);
     
     const fetchDeaths = async () => {
@@ -73,21 +83,108 @@ export default function Deaths() {
         router.push('/admin/deaths/register');
     };
 
+    // Function to check if the age matches the selected age filter
+    const checkAge = (dateOfBirth) => {
+        const today = new Date();
+        const birthDate = new Date(dateOfBirth);
+        const age = today.getFullYear() - birthDate.getFullYear();
+        const monthDiff = today.getMonth() - birthDate.getMonth();
+        const dayDiff = today.getDate() - birthDate.getDate();
+        const isMatchingAge =
+          (minAge === '' || (age > minAge) || (age === minAge && (monthDiff > 0 || (monthDiff === 0 && dayDiff >= 0)))) &&
+          (maxAge === '' || (age < maxAge) || (age === maxAge && (monthDiff < 0 || (monthDiff === 0 && dayDiff <= 0))));
+        
+        return isMatchingAge;
+    };  
+
+    const [showFilter, setShowFilter] = useState(false);
+
+    const handleToggleFilter = () => {
+        setShowFilter(!showFilter);
+    };
+
+    async function fetchDeathType() {
+        try {
+          const { data, error } = await supabase.from('type_of_deaths').select('id, name');
+          if (error) {
+            throw new Error(error.message);
+          }
+          setTypes(data);
+        } catch (error) {
+          console.log('Error fetching death types:', error.message);
+        }
+    }
+
+    async function fetchGenders() {
+        try {
+          const { data, error } = await supabase
+            .from('families')
+            .select('gender');
+        
+          if (error) {
+            throw new Error(error.message);
+          }
+      
+          const uniqueGenders = [];
+          data.forEach(row => {
+            if (!uniqueGenders.includes(row.gender)) {
+              uniqueGenders.push(row.gender);
+            }
+          });
+      
+          setGenders(uniqueGenders);
+        } catch (error) {
+          console.log('Error fetching gender:', error.message);
+        }
+    }
+    
+
+    const handleMinAgeChange = (e) => {
+        const inputMinAge = e.target.value !== '' ? parseInt(e.target.value) : '';
+        setMinAge(inputMinAge);
+    };
+    const handleMaxAgeChange = (e) => {
+        const inputMaxAge = e.target.value !== '' ? parseInt(e.target.value) : '';
+        setMaxAge(inputMaxAge);
+    };
+
     // Search and filter state
     const [searchQuery, setSearchQuery] = useState('');
     const filteredDeaths = deaths.filter((death) => {
         const isMatchingSearchQuery =
             (death.death_date && death.death_date.toLowerCase().includes(searchQuery.toLowerCase())) ||
             (death.death_place && death.death_place.toLowerCase().includes(searchQuery.toLowerCase())) ||
-            (death.type_of_deaths.name && death.type_of_deaths.name.toLowerCase().includes(searchQuery.toLowerCase())) ||
+            (death.type_of_deaths?.name && death.type_of_deaths?.name.toLowerCase().includes(searchQuery.toLowerCase())) ||
             (death.complainant && death.complainant.toLowerCase().includes(searchQuery.toLowerCase())) ||
             (death.remark && death.remark.toLowerCase().includes(searchQuery.toLowerCase())) ||
             (death.families.name && death.families.name.toLowerCase().includes(searchQuery.toLowerCase())) ||
             (death.families.date_of_birth && formatDate(death.families.date_of_birth).startsWith(searchQuery)) ||
             (death.families.nrc_id && death.families.nrc_id.toLowerCase().includes(searchQuery.toLowerCase())) ||
             (death.families.gender && death.families.gender.toLowerCase().includes(searchQuery.toLowerCase()));
-      
-        return isMatchingSearchQuery;
+
+            const isMatchingDeathType =
+            selectedType === '' || death.type_of_deaths?.name === selectedType;
+            
+            const isMatchingGender =
+            selectedGender === '' || death.families.gender === selectedGender;
+        
+            // const isMatchingAge = checkAge(death.families.date_of_birth);
+
+            const ageAtDeath = Math.floor(
+                (new Date(death.death_date) - new Date(death.families.date_of_birth)) /
+                (365.25 * 24 * 60 * 60 * 1000)
+            );
+
+            const isMatchingAge =
+                (minAge === '' || ageAtDeath >= minAge) &&
+                (maxAge === '' || ageAtDeath <= maxAge);
+
+        return (
+            isMatchingDeathType &&
+            isMatchingSearchQuery &&
+            isMatchingGender &&
+            isMatchingAge
+        );
     });
 
     // CSV Export Start
@@ -96,13 +193,18 @@ export default function Deaths() {
             const typeOfDeath = death.type_of_deaths?.name;
             const familyName = death.families?.name;
             const familyGender = death.families?.gender;
-            const familyDob = death.families?.date_of_birth;
+            const familyDob = formatDate(death.families?.date_of_birth);
             const villageName = death.families?.households?.villages?.name;
             const wardVillageTractName = death.families?.households?.ward_village_tracts?.name;
             const townshipName = death.families?.households?.townships?.name;
             const districtName = death.families?.households?.districts?.name;
             const stateRegionName = death.families?.households?.state_regions?.name;
-        
+            
+            const age = Math.floor(
+                (new Date(death.death_date) - new Date(death.families.date_of_birth)) /
+                (365.25 * 24 * 60 * 60 * 1000)
+            );
+
             return {
             id: death.id.toString(),
             name: familyName || '',
@@ -113,6 +215,7 @@ export default function Deaths() {
             remark: death.remark,
             gender: familyGender || '',
             dob: familyDob || '',
+            death_age: age,
             village: villageName || '',
             ward_village_tract: wardVillageTractName || '',
             township: townshipName || '',
@@ -124,6 +227,18 @@ export default function Deaths() {
         setCSVData(formattedData);
     }, [deaths, searchQuery]);
     // CSV Export End
+    
+     // const checkAgeCSV = (dateOfBirth) => {
+    //     const today = new Date();
+    //     const birthDate = new Date(dateOfBirth);
+    //     const yearDiff = today.getFullYear() - birthDate.getFullYear();
+    //     const monthDiff = today.getMonth() - birthDate.getMonth();
+    //     const dayDiff = today.getDate() - birthDate.getDate();
+
+    //     const age = yearDiff + (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0) ? -1 : 0 );
+        
+    //     return age;
+    // };    
     
     // Pagination Start
     const [currentPage, setCurrentPage] = useState(0);
@@ -224,6 +339,7 @@ export default function Deaths() {
         },
     });
     //Print end
+    
       
     return (
         <>
@@ -286,32 +402,81 @@ export default function Deaths() {
                             </button>
                         </div>
                     </div>
+                        
                     <div className="flow-root mt-8">
-                        <div className="sm:flex sm:items-center">
-                            <div className="sm:flex-auto">
-                                <div className="relative flex items-center mt-2">
-                                    <input
+
+                        <div className="flex items-center justify-between mb-4">
+                            <div className="flex items-center">
+                                <input
                                     type="text"
-                                    name="search"
-                                    id="search"
-                                    placeholder={t("filter.Search")}
                                     value={searchQuery}
                                     onChange={(e) => setSearchQuery(e.target.value)}
-                                    className="block w-full rounded-md border-0 py-1.5 pr-14 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-sky-600 sm:text-sm sm:leading-6"
-                                    />
-                                    <div className="absolute inset-y-0 right-0 flex py-1.5 pr-1.5">
-                                        <kbd className="inline-flex items-center px-1 font-sans text-xs text-gray-400 border border-gray-200 rounded">
-                                            ⌘K
-                                        </kbd>
-                                    </div>
-                                </div>
+                                    className="p-2 mr-2 border border-gray-300 rounded-md"
+                                    placeholder={t("filter.Search")}
+                                />
+                                <button
+                                    onClick={handleToggleFilter}
+                                    className="px-4 py-2 text-white rounded-md bg-sky-600 hover:bg-sky-700"
+                                >
+                                <GridFilterListIcon className="w-5 h-5 mr-2"></GridFilterListIcon>
+                                    Filter
+                                </button>
                             </div>
-                            <div className="mt-4 sm:ml-16 sm:mt-0 sm:flex-none">
-                                <p className="text-right text-gray-500">
-                                    {t("filter.TotalResults")}: {filteredDeaths.length}
-                                </p>
+                            <p className="text-gray-500">{t("filter.TotalResults")}: {filteredDeaths.length}</p>
+                        </div>
+
+                        {showFilter && (
+                        <div className="py-4 sm:grid sm:grid-cols-4 sm:gap-4">
+                            <div>
+                                <select 
+                                value={selectedType}
+                                onChange={(e) => setSelectedType(e.target.value)}
+                                className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-sky-600 sm:text-sm sm:leading-6">
+                                    <option value="">{t("filter.DeathType")}</option>
+                                    {/* Render Deaths Type options */}
+                                    {types.map((type) => (
+                                        <option key={type.id} value={type.name}>
+                                        {type.name}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+                            <div>
+                                <select
+                                    value={selectedGender}
+                                    onChange={(e) => setSelectedGender(e.target.value)}
+                                    className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-sky-600 sm:text-sm sm:leading-6"
+                                >
+                                    <option value="">{t("filter.Gender")}</option>
+                                    {genders.map((gender) => (
+                                    <option key={gender} value={gender}>
+                                        {gender}
+                                    </option>
+                                    ))}
+                                </select>
+                            </div>
+                            <div>
+                                <input
+                                type="number"
+                                value={minAge}
+                                onChange={handleMinAgeChange}
+                                className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-sky-600 sm:text-sm sm:leading-6"
+                                placeholder={t("filter.MinAge")}
+                                />
+                            </div>
+                            <div>
+                                <input
+                                type="number"
+                                value={maxAge}
+                                onChange={handleMaxAgeChange}
+                                className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-sky-600 sm:text-sm sm:leading-6"
+                                placeholder={t("filter.MaxAge")}
+                                />
                             </div>
                         </div>
+                    
+                        )}
+                        
                         
                         <div className="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
                             <div  className="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
@@ -495,7 +660,7 @@ export default function Deaths() {
                                                     'whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6 lg:pl-8'
                                                 )}
                                                 >
-                                                {death.type_of_deaths?.name}
+                                                {death.type_of_deaths?.name || 'NA'}
                                                 </td>
                                             <td
                                             className={classNames(
