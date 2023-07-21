@@ -46,6 +46,16 @@
       "Delete": "Delete",
       "Save": "Save"
     },
+    "table": {
+      "No": "No",
+      "Village": "Village",
+      "Gender": "Gender",
+      "Population": "Number of Case",
+      "AverageAge": "Average Age",
+      "Household": "Household",
+      "DisabilityType": "Number of Disability Type",
+      "DeathType": "Number of Death Type"
+    },
     "dashboard": {
       "TotalPopulations": "Total Populations",
       "TotalHouseholds": "Total Households",
@@ -54,13 +64,23 @@
       "TotalUsers": "Total Users",
       "VillageName": "Village Name",
       "TotalGender": "Total Gender",
-      "PopulationAndHouseholdRation": "Populations & Households Ratio",
+      "PopulationAndHouseholdRation": "Distribution of Populations & Households Ratio",
       "GenderRatio": "Gender Ratio",
       "Male": "Male",
       "Female": "Female",
       "Populations": "Populations",
       "Households": "Households",
-      "AverageAge": "Average Age"
+      "AverageAge": "Average Age",
+      "TotalCase": "Total Case",
+      "DistributionDeathTypes": "Distribution of Death Types",
+      "DistributionDisabilityTypes": "Distribution of Disability Types",
+      "TypeOfDisability": "Type of Disabilities",
+      "TypeOfDeath": "Type of Death",
+      "DistributionAgeGroup": "Distribution of Age Groups",
+      "AgeGroup": "Age Groups",
+      "DistributionResident": "Distribution of Resident in Village/Foreign and Age Groups",
+      "MaleFemale": "Male/Female",
+      "Options": "options"
     },
     "report": {
       "Reports": "Reports"
@@ -86,7 +106,8 @@
       "Search": "Search",
       "TotalResults": "Total Results",
       "DisabilityType": "Type of Disabilities",
-      "DeathType": "Type of Deaths"
+      "DeathType": "Type of Deaths",
+      "Year": "Year"
     },
     "other": {
       "Admin": "Admin",

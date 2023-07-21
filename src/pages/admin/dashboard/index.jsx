@@ -7,6 +7,7 @@ import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { useTranslation } from "next-i18next";
 import { useUserRoleCheckIsVillager } from '/src/components/utilities/useUserRoleCheckIsVillager.js';
 import { useSession } from '@supabase/auth-helpers-react'
+import Options from '@/components/admin/Options';
 
 export default function Dashboard() {
     const router = useRouter();
@@ -21,9 +22,6 @@ export default function Dashboard() {
     // useUserRoleCheckIsVillager();
     
     const { t } = useTranslation("");
-    const handleClick = () => {
-        router.push('/admin/reports');
-    };
     
     return (
         <>
@@ -42,15 +40,7 @@ export default function Dashboard() {
                         </h2>
                     </div>
                     <div className="flex mt-4 md:ml-4 md:mt-0">
-                        
-                            <button
-                            type="button"
-                            onClick={handleClick}
-                            className="inline-flex items-center px-3 py-2 ml-3 text-sm font-semibold text-white rounded-md shadow-sm bg-sky-600 hover:bg-sky-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-600"
-                            >
-                            {t("sidebar.Reports")}
-                            </button>
-                       
+                        <Options />
                     </div>
                 </div>
                 <Dashboards />

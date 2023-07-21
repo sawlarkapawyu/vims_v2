@@ -621,7 +621,6 @@ const Dashboard = () => {
       
 
     // Calculate total gender counts, family count, and household count for each village start
-
     const villageCounts = {};
     const householdCounts = {};
     let totalFamilies = 0;
@@ -1026,48 +1025,59 @@ const Dashboard = () => {
                         ],
                         }}
                         options={{
-                        indexAxis: 'x',
-                        responsive: true,
-                        plugins: {
-                            title: {
-                            display: true,
-                            text: t('dashboard.PopulationAndHouseholdRation'),
-                            position: 'top',
-                            font: {
-                                weight: 'bold',
-                                size: 18,
-                            },
-                            },
-                            legend: {
-                            display: true,
-                            position: 'bottom',
-                            },
-                            datalabels: {
-                            anchor: 'end',
-                            align: 'top',
-                            formatter: (value) => value,
-                            color: 'black',
-                            font: {
-                                weight: 'bold',
-                            },
-                            },
-                            tooltip: {
-                            callbacks: {
-                                title: (context) => barChartLabels[context[0].dataIndex],
-                                label: (context) => `Count: ${context.raw}`,
-                            },
+                            indexAxis: 'x',
+                            responsive: true,
+                            plugins: {
+                                title: {
+                                display: true,
+                                text: t('dashboard.PopulationAndHouseholdRation'),
+                                position: 'top',
+                                font: {
+                                    weight: 'bold',
+                                    size: 18,
+                                },
+                                },
+                                legend: {
+                                display: true,
+                                position: 'bottom',
+                                },
+                                datalabels: {
+                                anchor: 'end',
+                                align: 'top',
+                                formatter: (value) => value,
+                                color: 'black',
+                                font: {
+                                    weight: 'bold',
+                                },
+                                },
+                                tooltip: {
+                                callbacks: {
+                                    title: (context) => barChartLabels[context[0].dataIndex],
+                                    label: (context) => `Count: ${context.raw}`,
+                                },
                             },
                         },
                         scales: {
-                            y: {
-                            display: true,
-                            title: {
+                            x: {
                                 display: true,
-                                text: t('dashboard.TotalPopulations'),
-                                font: {
-                                weight: 'bold',
-                                size: 14,
-                                padding: { top: 40, bottom: 0 },
+                                title: {
+                                  display: true,
+                                  text: t('dashboard.VillageName'),
+                                  font: {
+                                    weight: 'bold',
+                                    size: 14,
+                                  },
+                                },
+                              },
+                            y: {
+                                display: true,
+                                title: {
+                                    display: true,
+                                    text: t('dashboard.TotalPopulations'),
+                                    font: {
+                                    weight: 'bold',
+                                    size: 14,
+                                    padding: { top: 40, bottom: 0 },
                                 },
                             },
                             },

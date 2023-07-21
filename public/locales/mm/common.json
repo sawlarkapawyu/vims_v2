@@ -46,6 +46,16 @@
         "Delete": "ဖျက်မည်",
         "Save": "ပြင်မည်"
       },
+      "table": {
+        "No": "စဉ်",
+        "Village": "ကျေရွာ",
+        "Gender": "လိင်",
+        "Population": "အရေအတွက်စုစုပေါင်း",
+        "AverageAge": "ပျမ်းမျှအသက်",
+        "Household": "အိမ်ထောင်စု",
+        "DisabilityType": "မသန်စွမ်း အမျိုးအစား",
+        "DeathType": "သေဆုံးမှု အမျိုးအစား"
+      },
     "dashboard": {
         "TotalPopulations": "စုစုပေါင်း လူဦးရေများ",
         "TotalHouseholds": "စုစုပေါင်း အိမ်ထောင်စုများ",
@@ -60,7 +70,17 @@
         "Female": "မ",
         "Populations": "လူဉီးရေ",
         "Households": "အိမ်ထောင်စု",
-        "AverageAge": "ပျမ်းမျှအသက်"
+        "AverageAge": "ပျမ်းမျှအသက်",
+        "TotalCase": "စုစုပေါင်း",
+        "DistributionDeathTypes": "သေဆုံးခြင်းနှင့် အမျိုးအစားများ အချိုးအစား",
+        "DistributionDisabilityTypes": "မသန်စွမ်းနှင့် အမျိုးအစားများ အချိုးအစား",
+        "TypeOfDisability": "မသန်စွမ်း အမျိုးအစား",
+        "TypeOfDeath": "သေးဆုံးခြင်းအမျိုးအစား",
+        "DistributionAgeGroup": "အသက်အရွယ်အလိုက် အချိုးအစား",
+        "AgeGroup": "အသက်",
+        "DistributionResident": "အသက်အရွယ်လိုက် အချိုးအစားနှင့် နေထိုင်မှု အချိုးအစား",
+        "MaleFemale": "ကျား/မ",
+        "Options": "ရွေးချယ်စရာများ"
     },
     "report": {
         "Reports": "အစီရင်ခံစာများ"
@@ -86,7 +106,8 @@
         "Search": "ရှာရန်",
         "TotalResults": "စုစုပေါင်းရလဒ်",
         "DisabilityType": "မသန်စွမ်း အမျိုးအစားများ",
-        "DeathType": "သေဆုံးမှု အမျိုးအစားများ"
+        "DeathType": "သေဆုံးမှု အမျိုးအစားများ",
+        "Year": "ခုနှစ်"
     },
     "other": {
         "Admin": "စီမံခန့်ခွဲသူ",

@@ -27,6 +27,8 @@ export default function Disability() {
     const [disabilities, setDisabilities] = useState([]);
     const [csvData, setCSVData] = useState([]);
 
+    const [villages, setVillages] = useState([]);
+    const [selectedVillage, setSelectedVillage] = useState('');
     const [types, setTypes] = useState([]);
     const [selectedType, setSelectedType] = useState('');
     const [genders, setGenders] = useState([]);
@@ -38,7 +40,8 @@ export default function Disability() {
 
     useEffect(() => {
         fetchDisabilities();
-        fetchDeathType();
+        fetchVillages();
+        fetchDisabilityType();
         fetchGenders();
     }, []);
     
@@ -102,7 +105,19 @@ export default function Disability() {
         setShowFilter(!showFilter);
     };
 
-    async function fetchDeathType() {
+    async function fetchVillages() {
+        try {
+          const { data, error } = await supabase.from('villages').select('id, name');
+          if (error) {
+            throw new Error(error.message);
+          }
+          setVillages(data);
+        } catch (error) {
+          console.log('Error fetching villages:', error.message);
+        }
+    }
+
+    async function fetchDisabilityType() {
         try {
           const { data, error } = await supabase.from('type_of_disabilities').select('id, name');
           if (error) {
@@ -157,6 +172,8 @@ export default function Disability() {
         (disability.families.nrc_id && disability.families.nrc_id.toLowerCase().includes(searchQuery.toLowerCase())) ||
         (disability.families.gender && disability.families.gender.toLowerCase().includes(searchQuery.toLowerCase()));
 
+        const isMatchingVillage = selectedVillage === '' || disability.families.households.villages.name === selectedVillage;
+
         const isMatchingDisabilityType =
             selectedType === '' || disability.type_of_disabilities.name === selectedType;
         const isMatchingGender =
@@ -165,6 +182,7 @@ export default function Disability() {
         const isMatchingAge = checkAge(disability.families.date_of_birth);
 
         return (
+            isMatchingVillage &&
             isMatchingDisabilityType &&
             isMatchingSearchQuery &&
             isMatchingGender &&
@@ -397,7 +415,17 @@ export default function Disability() {
                         </div>
 
                         {showFilter && (
-                        <div className="py-4 sm:grid sm:grid-cols-4 sm:gap-4">
+                        <div className="py-4 sm:grid sm:grid-cols-5 sm:gap-4">
+                            <div>
+                                <select value={selectedVillage} onChange={(e) => setSelectedVillage(e.target.value)} className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-sky-600 sm:text-sm sm:leading-6">
+                                    <option value="">{t("filter.Villages")}</option>
+                                        {villages.map((village) => (
+                                        <option key={village.id} value={village.name}>
+                                        {village.name}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
                             <div>
                                 <select 
                                 value={selectedType}
