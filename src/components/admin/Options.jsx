@@ -29,7 +29,7 @@ export default function Options() {
                 leaveFrom="transform opacity-100 scale-100"
                 leaveTo="transform opacity-0 scale-95"
             >
-                <Menu.Items className="absolute right-0 z-10 mt-2 origin-top-right bg-white rounded-md shadow-lg w-60 ring-1 ring-black ring-opacity-5 focus:outline-none">
+                <Menu.Items className="lg:right-0 absolute right-[-5rem] lg:w-60 w-44 z-10 mt-2 origin-top-right bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
                 <div className="py-2">
                     <Menu.Item>
                     {({ active }) => (
