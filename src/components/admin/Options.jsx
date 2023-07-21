@@ -2,6 +2,7 @@ import { Fragment } from 'react'
 import { Menu, Transition } from '@headlessui/react'
 import { ChevronDownIcon } from '@heroicons/react/20/solid'
 import { useTranslation } from "next-i18next";
+import Link from "next/link";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(' ')
@@ -32,7 +33,7 @@ export default function Options() {
                 <div className="py-2">
                     <Menu.Item>
                     {({ active }) => (
-                        <a
+                        <Link
                         href="/admin/dashboard/death_type_chart"
                         className={classNames(
                             active ? 'bg-gray-100 text-gray-900' : 'text-gray-700',
@@ -40,12 +41,12 @@ export default function Options() {
                         )}
                         >
                         {t("dashboard.DistributionDeathTypes")}
-                        </a>
+                        </Link>
                     )}
                     </Menu.Item>
                     <Menu.Item>
                     {({ active }) => (
-                        <a
+                        <Link
                         href="/admin/dashboard/disability_type_chart"
                         className={classNames(
                             active ? 'bg-gray-100 text-gray-900' : 'text-gray-700',
@@ -53,12 +54,12 @@ export default function Options() {
                         )}
                         >
                         {t("dashboard.DistributionDisabilityTypes")}
-                        </a>
+                        </Link>
                     )}
                     </Menu.Item>
                     <Menu.Item>
                     {({ active }) => (
-                        <a
+                        <Link
                         href="/admin/dashboard/age_group_chart"
                         className={classNames(
                             active ? 'bg-gray-100 text-gray-900' : 'text-gray-700',
@@ -66,12 +67,12 @@ export default function Options() {
                         )}
                         >
                         {t("dashboard.DistributionAgeGroup")}
-                        </a>
+                        </Link>
                     )}
                     </Menu.Item>
                     <Menu.Item>
                     {({ active }) => (
-                        <a
+                        <Link
                         href="/admin/dashboard/age_group_resident_chart"
                         className={classNames(
                             active ? 'bg-gray-100 text-gray-900' : 'text-gray-700',
@@ -79,7 +80,7 @@ export default function Options() {
                         )}
                         >
                             {t("dashboard.DistributionResident")}
-                        </a>
+                        </Link>
                     )}
                     </Menu.Item>
                 </div>
