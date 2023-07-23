@@ -431,7 +431,6 @@ export default function DeathChart() {
                     <div className="flow-root mt-8">
                         <div class="flex flex-wrap py-8">
                             <div class="w-full sm:w-2/3 md:w-2/3 lg:w-2/3 xl:w-2/3">
-                                
                                 <div className="mt-4">
                                 {Object.keys(deathTypeData).length > 0 ? (
                                     <Bar 
